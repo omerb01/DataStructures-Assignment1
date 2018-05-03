@@ -3,4 +3,4 @@ project(DataStructures_HW1)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(DataStructures_HW1 main.cpp)
+add_executable(DataStructures_HW1 main.cpp AVLTree.h)

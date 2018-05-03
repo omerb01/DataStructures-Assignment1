@@ -1,0 +1,11 @@
+//
+// Created by Omer on 03/05/2018.
+//
+
+#ifndef DATASTRUCTURES_HW1_AVLTREE_H
+
+
+
+#define DATASTRUCTURES_HW1_AVLTREE_H
+
+#endif //DATASTRUCTURES_HW1_AVLTREE_H
