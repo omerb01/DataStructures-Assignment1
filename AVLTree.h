@@ -44,12 +44,8 @@ class AVLTree {
         }
     }
 
-public:
-    AVLTree() : root(nullptr) {}
-
-    bool insert(T data, int key1, int key2) {
+    Node *binarySearch(int key1, int key2) {
         Node *iterator = root;
-        string path="";
         while (iterator->right != nullptr && iterator->left != nullptr) {
             if (iterator->key1 == key1 && iterator->key2 == key2) break;
             else if (key1 < iterator->key1 ||
@@ -59,41 +55,53 @@ public:
                 iterator = iterator->right;
             }
         }
-        if (iterator->key1 == key1 && iterator->key2 == key2) {
-            return false;
-        }
+        return iterator;
+    }
+
+    Node *createVertex(Node *parent, T data, int key1, int key2) {
         Node *new_node = new Node(data, key1, key2);
-        if (key1 < iterator->key1 ||
-            (key1 == iterator->key1 && key2 > iterator->key2)) {
-            iterator->left = new_node;
+        if (key1 < parent->key1 ||
+            (key1 == parent->key1 && key2 > parent->key2)) {
+            parent->left = new_node;
         } else {
-            iterator->right = new_node;
+            parent->right = new_node;
         }
-        new_node->parent = iterator;
-        Node *p, *v=new_node;
+        new_node->parent = parent;
+        return new_node;
+    }
+
+public:
+    AVLTree() : root(nullptr) {}
+
+    bool insert(T data, int key1, int key2) {
+        Node *parent = this->binarySearch(key1, key2);
+        if (parent->key1 == key1 && parent->key2 == key2) return false;
+        Node *new_node = createVertex(parent, data, key1, key2);
+
+        Node *p, *v = new_node;
+        string path = "";
         while (v != root) {
             int height_p, height_v;
             p = v->parent;
-            p->h_left > p->h_right ? height_p = p->h_left + 1 : height_p =
-                                                                        p->h_right +
-                                                                        1;
-            v->h_left > v->h_right ? height_v = v->h_left + 1 : height_v =
-                                                                        v->h_right +
-                                                                        1;
-            if(height_p >= height_v+1){
-                return true;
-            }
-            if(p->right==v){
+
+            p->h_left > p->h_right ?
+                    height_p = p->h_left + 1 : height_p = p->h_right + 1;
+            v->h_left > v->h_right ?
+                    height_v = v->h_left + 1 : height_v = v->h_right + 1;
+            if (height_p >= height_v + 1) return true;
+
+            if (p->right == v) {
                 path = "R" + path;
                 p->h_right++;
-            }else{
+            } else {
                 path = "L" + path;
                 p->h_left++;
             }
-            if(abs(p->h_left - p->h_right)>1){
+
+            if (abs(p->h_left - p->h_right) > 1) {
                 // switch case n' roll
-            }else{
-                v=p;
+            } else {
+                v = p;
             }
 
         }
