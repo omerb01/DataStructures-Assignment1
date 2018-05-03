@@ -14,7 +14,9 @@ class AVLTree {
         int key1;
         int key2;
         Node *left;
+        int h_left;
         Node *right;
+        int h_right;
     };
 
     Node *root;
@@ -36,7 +38,12 @@ public:
     AVLTree() : root(nullptr) {}
 
     void insert(T data, int key1, int key2) {
+        Node* iterator=root;
+        if(root->key1 == key1 && root->key2 == key2) return;
+        else if (key1 < root->key1 ||
+                 (key1 == root->key1 && key2 > root->key2)){
 
+        }
     }
 };
 
