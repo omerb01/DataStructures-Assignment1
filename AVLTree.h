@@ -75,6 +75,50 @@ class AVLTree {
         return vertex->h_right +1;
     }
 
+    void roll_LL(Node *unbalanced) {
+        Node *left, *right, *n_parent;
+        right = unbalanced;
+
+        n_parent = unbalanced->left; // new parent - left node of the unbalanced node
+        unbalanced->left = n_parent->right; // if new node has right children, move to to old parent
+        n_parent->right = right;
+        n_parent->parent = unbalanced->parent;
+        right->parent = n_parent;
+
+    }
+
+    void roll_RR(Node *unbalanced) {
+        Node *left, *right, *n_parent;
+        left = unbalanced;
+
+        n_parent = unbalanced->right; // new parent - left node of the unbalanced node
+        unbalanced->right = n_parent->left; // if new node has right children, move to to old parent
+        n_parent->left = unbalanced;
+        n_parent->parent = unbalanced->parent;
+        left->parent = n_parent;
+    }
+
+    void roll_RL(Node *unbalanced){
+        Node *old_parent,*right_left,*unbalanced_right;
+        unbalanced_right=unbalanced->right;
+        right_left=unbalanced->right->left;
+        unbalanced->right->left=right_left->right;
+        unbalanced->right=right_left->left;
+        unbalanced->parent=right_left;
+        right_left->left=unbalanced;
+        right_left->right=unbalanced_right;
+    }
+    void roll_LR(Node *unbalanced){
+        Node *old_parent,*left_right,*unbalanced_left;
+        unbalanced_left=unbalanced->left;
+        left_right=unbalanced->left->right;
+        unbalanced->right->left=left_right->left;
+        unbalanced->left=left_right->right;
+        unbalanced->parent=left_right;
+        left_right->right=unbalanced;
+        left_right->left=unbalanced_left;
+    }
+
 public:
     AVLTree() : root(nullptr) {}
 
@@ -100,6 +144,7 @@ public:
 
             if (abs(p->h_left - p->h_right) > 1) {
                 // switch case n' roll
+                // update the height ??
             } else {
                 v = p;
             }
