@@ -198,14 +198,16 @@ class AVLTree {
         Node *right = buildEmptyCompleteTree(height - 1);
 
         Node *root = new Node();
-
-        root->right = right;
-        root->h_right = getHeight(right);
-        right->parent = root;
-
-        root->left = left;
-        root->h_left = getHeight(left);
-        left->parent = root;
+        if (right != nullptr) {
+            root->right = right;
+            root->h_right = getHeight(right);
+            right->parent = root;
+        }
+        if (left != nullptr) {
+            root->left = left;
+            root->h_left = getHeight(left);
+            left->parent = root;
+        }
 
         return root;
     }
