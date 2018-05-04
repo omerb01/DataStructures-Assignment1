@@ -8,6 +8,7 @@
 #include <string>
 #include <array>
 #include <vector>
+#include "exceptions.h"
 
 #ifndef DATASTRUCTURES_HW1_AVLTREE_H
 #define DATASTRUCTURES_HW1_AVLTREE_H
@@ -40,19 +41,6 @@ class AVLTree {
     Node *root;
 
     explicit AVLTree(Node *root) : root(root) {}
-
-    static Node *findNode(Node *root, int key1, int key2) {
-        if (root == nullptr) return nullptr;
-
-        if (root->key1 == key1 && root->key2 == key2) {
-            return root;
-        } else if (key1 < root->key1 ||
-                   (key1 == root->key1 && key2 > root->key2)) {
-            return findNode(root->left, key1, key2);
-        } else {
-            return findNode(root->right, key1, key2);
-        }
-    }
 
     Node *binarySearch(int key1, int key2) {
         Node *iterator = root;
@@ -252,6 +240,14 @@ class AVLTree {
 
 public:
     AVLTree() : root(nullptr) {}
+
+    T find(int key1, int key2) {
+        Node *node = binarySearch(key1, key2);
+        if(key1 != node->key1 || key2 != node->key2) {
+            throw AVLElementNotFound();
+        }
+        return node->data;
+    }
 
     bool insert(const T &data, int key1, int key2) {
         Node *parent = binarySearch(key1, key2);
