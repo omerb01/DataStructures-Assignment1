@@ -85,7 +85,7 @@ class AVLTree {
         return vertex->h_right + 1;
     }
 
-    void roll_LL(Node *unbalanced) {
+    static void roll_LL(Node *unbalanced) {
         Node *left, *right, *n_parent;
         right = unbalanced;
 
@@ -97,7 +97,7 @@ class AVLTree {
 
     }
 
-    void roll_RR(Node *unbalanced) {
+    static void roll_RR(Node *unbalanced) {
         Node *left, *right, *n_parent;
         left = unbalanced;
 
@@ -108,25 +108,26 @@ class AVLTree {
         left->parent = n_parent;
     }
 
-    void roll_RL(Node *unbalanced){
-        Node *old_parent,*right_left,*unbalanced_right;
-        unbalanced_right=unbalanced->right;
-        right_left=unbalanced->right->left;
-        unbalanced->right->left=right_left->right;
-        unbalanced->right=right_left->left;
-        unbalanced->parent=right_left;
-        right_left->left=unbalanced;
-        right_left->right=unbalanced_right;
+    static void roll_RL(Node *unbalanced) {
+        Node *old_parent, *right_left, *unbalanced_right;
+        unbalanced_right = unbalanced->right;
+        right_left = unbalanced->right->left;
+        unbalanced->right->left = right_left->right;
+        unbalanced->right = right_left->left;
+        unbalanced->parent = right_left;
+        right_left->left = unbalanced;
+        right_left->right = unbalanced_right;
     }
-    void roll_LR(Node *unbalanced){
-        Node *old_parent,*left_right,*unbalanced_left;
-        unbalanced_left=unbalanced->left;
-        left_right=unbalanced->left->right;
-        unbalanced->right->left=left_right->left;
-        unbalanced->left=left_right->right;
-        unbalanced->parent=left_right;
-        left_right->right=unbalanced;
-        left_right->left=unbalanced_left;
+
+    static void roll_LR(Node *unbalanced) {
+        Node *old_parent, *left_right, *unbalanced_left;
+        unbalanced_left = unbalanced->left;
+        left_right = unbalanced->left->right;
+        unbalanced->right->left = left_right->left;
+        unbalanced->left = left_right->right;
+        unbalanced->parent = left_right;
+        left_right->right = unbalanced;
+        left_right->left = unbalanced_left;
     }
 
     static int getSize(Node *vertex) {
