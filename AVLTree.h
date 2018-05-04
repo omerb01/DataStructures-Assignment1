@@ -135,11 +135,11 @@ class AVLTree {
         return 1 + getSize(vertex->left) + getSize(vertex->right);
     }
 
-    static void toArray(Node *vertex, vector<Node *> &result) {
+    static void sortToArray(Node *vertex, vector<Node *> &result) {
         if (vertex == nullptr) return;
-        toArray(vertex->left, result);
+        sortToArray(vertex->left, result);
         result.push_back(vertex);
-        toArray(vertex->right, result);
+        sortToArray(vertex->right, result);
     }
 
     static vector<Node *> mergeNodeArrays(const vector<Node *> a, const vector<Node *> b) {
@@ -198,9 +198,13 @@ class AVLTree {
         Node *right = buildEmptyCompleteTree(height - 1);
 
         Node *root = new Node();
+
         root->right = right;
+        root->h_right = getHeight(right);
         right->parent = root;
+
         root->left = left;
+        root->h_left = getHeight(left);
         left->parent = root;
 
         return root;
@@ -282,10 +286,10 @@ public:
     static AVLTree merge(const AVLTree &tree1, const AVLTree &tree2) {
 
         vector<Node *> a;
-        tree1.toArray(tree1.root, a);
+        tree1.sortToArray(tree1.root, a);
 
         vector<Node *> b;
-        tree1.toArray(tree2.root, b);
+        tree1.sortToArray(tree2.root, b);
 
         vector<Node *> temp = mergeNodeArrays(a, b);
         vector<Node *> c = clearSameElements(temp);
