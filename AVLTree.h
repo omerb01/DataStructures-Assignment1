@@ -24,9 +24,9 @@ class AVLTree {
         Node *right;
         int h_right;
 
-        Node(T d, int k1, int k2) : data(d), key1(k1), key2(k2), left(nullptr),
-                                    right(nullptr), parent(nullptr), h_left(-1),
-                                    h_right(-1) {}
+        Node(T data, int key1, int key2) : data(data), key1(key1), key2(key2),
+                                           left(nullptr), right(nullptr),
+                                           h_right(-1) {}
     };
 
     Node *root;
@@ -70,25 +70,25 @@ class AVLTree {
         return new_node;
     }
 
+    static int getHeight(Node *vertex) {
+        if(vertex->h_left > vertex->h_right) return vertex->h_left + 1;
+        return vertex->h_right +1;
+    }
+
 public:
     AVLTree() : root(nullptr) {}
 
     bool insert(T data, int key1, int key2) {
-        Node *parent = this->binarySearch(key1, key2);
+        Node *parent = binarySearch(key1, key2);
         if (parent->key1 == key1 && parent->key2 == key2) return false;
         Node *new_node = createVertex(parent, data, key1, key2);
 
         Node *p, *v = new_node;
         string path = "";
         while (v != root) {
-            int height_p, height_v;
             p = v->parent;
 
-            p->h_left > p->h_right ?
-                    height_p = p->h_left + 1 : height_p = p->h_right + 1;
-            v->h_left > v->h_right ?
-                    height_v = v->h_left + 1 : height_v = v->h_right + 1;
-            if (height_p >= height_v + 1) return true;
+            if (getHeight(p) >= getHeight(v) + 1) return true;
 
             if (p->right == v) {
                 path = "R" + path;
