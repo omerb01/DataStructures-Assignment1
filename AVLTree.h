@@ -351,7 +351,7 @@ class AVLTree {
             Node *parent = iterator->parent;
             deleteVertex(iterator); // one son or a leaf
 
-            // TODO: update heights properly
+            // TODO: update heights properly ???? mabye not needed
 
             // SOMETHING'S WRONG:
 
