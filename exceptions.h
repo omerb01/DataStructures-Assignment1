@@ -15,6 +15,6 @@
     }}
 
 NEW_EXCEPTION(AVLTreeException, std::exception);
-NEW_EXCEPTION(AVLElementNotFound, AVLElementNotFound);
+NEW_EXCEPTION(AVLElementNotFound, AVLTreeException);
 
 #endif //DATASTRUCTURES_HW1_EXCEPTIONS_H
