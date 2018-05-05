@@ -284,10 +284,10 @@ public:
     static AVLTree merge(const AVLTree &tree1, const AVLTree &tree2) {
         // TODO: change from vectors to arrays
         vector<Node *> a;
-        tree1.sortToArray(tree1.root, a);
+        sortToArray(tree1.root, a);
 
         vector<Node *> b;
-        tree1.sortToArray(tree2.root, b);
+        sortToArray(tree2.root, b);
 
         vector<Node *> temp = mergeNodeArrays(a, b);
         vector<Node *> c = clearSameElements(temp);
