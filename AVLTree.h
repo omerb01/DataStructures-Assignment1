@@ -282,7 +282,7 @@ public:
     }
 
     static AVLTree merge(const AVLTree &tree1, const AVLTree &tree2) {
-
+        // TODO: change from vectors to arrays
         vector<Node *> a;
         tree1.sortToArray(tree1.root, a);
 
