@@ -523,8 +523,8 @@ public:
     }
 
     T *preOrderToArray() {
-        T *temp = new T[getSize(root)];
-        T* result = temp;
+        T *result = new T[getSize(root)];
+        T* temp = result;
         preOrderToArrayRecursive(root, &temp);
         return result;
     }
