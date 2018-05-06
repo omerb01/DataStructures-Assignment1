@@ -392,6 +392,8 @@ class AVLTree {
 
         copy_node->left = copyTreeRecursive(root->right);
         copy_node->left->parent = copy_node;
+
+        return copy_node;
     }
 
     static void inOrderToArrayRecursive(Node *root, T **array) {
