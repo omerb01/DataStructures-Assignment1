@@ -83,6 +83,7 @@ class AVLTree {
     }
 
     static int getHeight(Node *vertex) {
+        if (vertex == nullptr) return -1;
         if (vertex->h_left > vertex->h_right) return vertex->h_left + 1;
         return vertex->h_right + 1;
     }
@@ -93,7 +94,13 @@ class AVLTree {
         new_parent = unbalanced->left; // new parent - left node of the unbalanced node
         unbalanced->left = new_parent->right; // if new node has right children, move to to old parent
         unbalanced->h_left = new_parent->h_right;
-        if (unbalanced->parent != nullptr) unbalanced->parent->right = new_parent;
+        if (unbalanced->parent != nullptr) {
+            if (unbalanced->parent->left == unbalanced) {
+                unbalanced->parent->left = new_parent;
+            } else {
+                unbalanced->parent->right = new_parent;
+            }
+        }
         new_parent->right = unbalanced;
         new_parent->h_right = getHeight(unbalanced);
 
@@ -108,7 +115,11 @@ class AVLTree {
         new_parent = unbalanced->right; // new parent - left node of the unbalanced node
         unbalanced->right = new_parent->left; // if new node has right children, move to to old parent
         unbalanced->h_right = new_parent->h_left;
-        if (unbalanced->parent != nullptr) unbalanced->parent->left = new_parent;
+        if (unbalanced->parent->left == unbalanced) {
+            unbalanced->parent->left = new_parent;
+        } else {
+            unbalanced->parent->right = new_parent;
+        }
         new_parent->left = unbalanced;
         new_parent->h_left = getHeight(unbalanced);
 
@@ -308,10 +319,8 @@ class AVLTree {
             root = nullptr;
         } else if (parent->right == node) {
             parent->right = nullptr;
-            parent->h_right--;
         } else {
             parent->left = nullptr;
-            parent->h_left--;
         }
         delete node;
     }
@@ -330,18 +339,16 @@ class AVLTree {
             son->parent = nullptr;
         } else if (parent->right == node) {
             parent->right = son;
-            parent->h_right--;
         } else {
             parent->left = son;
-            parent->h_left--;
         }
         son->parent = parent;
         delete node;
 
     }
 
-    Node* deleteVertex(Node *node) {
-        Node* parent = node->parent;
+    Node *deleteVertex(Node *node) {
+        Node *parent = node->parent;
         if (node->left == nullptr && node->right == nullptr) {
             deleteVertexLeaf(node);
         } else if (node->left == nullptr && node->right != nullptr) {
@@ -358,9 +365,40 @@ class AVLTree {
         return parent;
     }
 
+    static int getBalanceFactor(Node *vertex) {
+        return vertex->h_left - vertex->h_right;
+    }
+
+    static void deleteTree(Node *root) {
+        if (root == nullptr) return;
+        deleteTree(root->left);
+        deleteTree(root->right);
+        delete root;
+    }
+
+    static void inOrderToArrayRecursive(Node *root, T **array) {
+        if (root == nullptr) return;
+        inOrderToArrayRecursive(root->left, array);
+        **array = root->data;
+        (*array)++;
+        inOrderToArrayRecursive(root->right, array);
+    }
+
+    static void preOrderToArrayRecursive(Node *root, T **array) {
+        if (root == nullptr) return;
+        **array = root->data;
+        (*array)++;
+        preOrderToArrayRecursive(root->left, array);
+        preOrderToArrayRecursive(root->right, array);
+    }
+
 public:
     AVLTree() {
         root = nullptr;
+    }
+
+    ~AVLTree() {
+        deleteTree(root);
     }
 
     T find(int key1, int key2) {
@@ -383,7 +421,6 @@ public:
         }
 
         Node *p, *v = new_node;
-        string path = "";
         while (v != root) {
             p = v->parent;
 
@@ -397,22 +434,24 @@ public:
             }
 
             if (p->right == v) {
-                path = "R" + path;
                 p->h_right++;
             } else {
-                path = "L" + path;
                 p->h_left++;
             }
 
-            if (abs(p->h_left - p->h_right) > 1) {
-                if (path.compare(0, 2, "RR") == 0) {
-                    roll_RR(p);
-                } else if (path.compare(0, 2, "LL") == 0) {
-                    roll_LL(p);
-                } else if (path.compare(0, 2, "RL") == 0) {
-                    roll_RL(p);
-                } else if (path.compare(0, 2, "LR") == 0) {
-                    roll_LR(p);
+            if (abs(getBalanceFactor(p)) > 1) {
+                if (getBalanceFactor(p) < 0) {
+                    if (getBalanceFactor(p->right) < 0) {
+                        roll_RR(p);
+                    } else if (getBalanceFactor(p->right) > 0) {
+                        roll_RL(p);
+                    }
+                } else if (getBalanceFactor(p) > 0) {
+                    if (getBalanceFactor(p->left) < 0) {
+                        roll_LR(p);
+                    } else if (getBalanceFactor(p->left) > 0) {
+                        roll_LL(p);
+                    }
                 }
                 break;
             } else {
@@ -427,43 +466,36 @@ public:
         if (node == nullptr) return false;
         if (node->key1 != key1 || node->key2 != key2) return false;
 
-        Node* v = deleteVertex(node);
-        Node *p;
-        string path = "";
-        while (v != root && v != nullptr) {
+        Node *v = deleteVertex(node);
+        Node *p = nullptr;
+        while (v != nullptr) {
             p = v->parent;
-            // TODO: fix heights update
-            if (getHeight(p) >= getHeight(v) + 1) {
-                if (p->right == v) {
-                    p->h_right--;
-                } else {
-                    p->h_left--;
-                }
-            }
 
-            if (p->right == v) {
-                path = "R" + path;
-            } else {
-                path = "L" + path;
-            }
+            v->h_right = getHeight(v->right);
+            v->h_left = getHeight(v->left);
 
-            if (abs(p->h_left - p->h_right) > 1) {
-                int old_p_height = getHeight(p);
-                if (path.compare(0, 2, "RR") == 0) {
-                    roll_RR(p);
-                } else if (path.compare(0, 2, "LL") == 0) {
-                    roll_LL(p);
-                } else if (path.compare(0, 2, "RL") == 0) {
-                    roll_RL(p);
-                } else if (path.compare(0, 2, "LR") == 0) {
-                    roll_LR(p);
+            if (abs(getBalanceFactor(v)) > 1) {
+                int old_v_height = getHeight(v);
+                if (getBalanceFactor(v) < 0) {
+                    if (getBalanceFactor(v->right) < 0) {
+                        roll_RR(v);
+                    } else if (getBalanceFactor(v->right) > 0) {
+                        roll_RL(v);
+                    }
+                } else if (getBalanceFactor(v) > 0) {
+                    if (getBalanceFactor(v->left) < 0) {
+                        roll_LR(v);
+                    } else if (getBalanceFactor(v->left) > 0) {
+                        roll_LL(v);
+                    }
                 }
-                if (old_p_height == getHeight(p)) break;
+                if (old_v_height == getHeight(v)) break;
+                if (v == root) break;
             } else {
+                if (v == root) break;
                 v = p;
             }
         }
-
         return true;
     }
 
@@ -481,6 +513,20 @@ public:
         Node **c = clearSameElements(temp, size_a + size_b, &new_size);
 
         return AVLTree(buildIncompleteTree(c, new_size));
+    }
+
+    T *inOrderToArray() {
+        T *temp = new T[getSize(root)];
+        T* result = temp;
+        inOrderToArrayRecursive(root, &temp);
+        return result;
+    }
+
+    T *preOrderToArray() {
+        T *temp = new T[getSize(root)];
+        T* result = temp;
+        preOrderToArrayRecursive(root, &temp);
+        return result;
     }
 };
 
