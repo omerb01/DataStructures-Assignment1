@@ -332,17 +332,16 @@ class AVLTree {
 
     }
 
-    static bool deleteVertex(Node *node) {
-        Node *parent = node->parent;
+    static void deleteVertex(Node *node) {
         if (node->left == nullptr && node->right == nullptr) {
             deleteVertexLeaf(node);
-            return true;
+            return;
         } else if (node->left == nullptr && node->right != nullptr) {
             deleteVertexOneSon(node, "right");
-            return true;
+            return;
         } else if (node->right == nullptr && node->left != nullptr) {
             deleteVertexOneSon(node, "left");
-            return true;
+            return;
         } else { // Two sons
             Node *iterator = node->right;
             while (iterator->left != nullptr) iterator = iterator->left;
@@ -369,7 +368,7 @@ class AVLTree {
                 parent->h_right--;
             }*/
 
-            return true;
+            return;
         }
     }
 
@@ -443,7 +442,7 @@ public:
         if (node->key1 != key1 || node->key2 != key2) return false;
 
         Node *parent = node->parent;
-        if (!deleteVertex(node)) return false;
+        deleteVertex(node);
 
         // TODO: complete this function
 
