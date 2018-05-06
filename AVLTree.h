@@ -288,21 +288,25 @@ class AVLTree {
         return root;
     }
 
-    static void swapNodesData(Node *v1, Node *v2) {
+    void swapNodesData(Node *v1, Node *v2) {
         T temp_data = v1->data;
         int temp_key1 = v1->key1;
         int temp_key2 = v1->key2;
+
         v1->data = v2->data;
         v1->key1 = v2->key1;
         v1->key2 = v2->key2;
+
         v2->data = temp_data;
         v2->key1 = temp_key1;
         v2->key2 = temp_key2;
     }
 
-    static void deleteVertexLeaf(Node *node) {
+    void deleteVertexLeaf(Node *node) {
         Node *parent = node->parent;
-        if (parent->right == node) {
+        if (parent == nullptr) {
+            root = nullptr;
+        } else if (parent->right == node) {
             parent->right = nullptr;
             parent->h_right--;
         } else {
@@ -312,64 +316,46 @@ class AVLTree {
         delete node;
     }
 
-    static void deleteVertexOneSon(Node *node, string flag) {
+    void deleteVertexOneSon(Node *node, string flag) {
         Node *parent = node->parent;
-        Node *temp;
-        if (!flag.compare("right")) {
-            temp = node->right;
+        Node *son;
+        if (flag.compare("right") == 0) {
+            son = node->right;
         } else { // "left"
-            temp = node->left;
+            son = node->left;
         }
 
-        if (parent->right == node) {
-            parent->right = temp;
+        if (parent == nullptr) {
+            root = son;
+            son->parent = nullptr;
+        } else if (parent->right == node) {
+            parent->right = son;
             parent->h_right--;
         } else {
-            parent->left = temp;
+            parent->left = son;
             parent->h_left--;
         }
+        son->parent = parent;
         delete node;
 
     }
 
-    static void deleteVertex(Node *node) {
+    Node* deleteVertex(Node *node) {
+        Node* parent = node->parent;
         if (node->left == nullptr && node->right == nullptr) {
             deleteVertexLeaf(node);
-            return;
         } else if (node->left == nullptr && node->right != nullptr) {
             deleteVertexOneSon(node, "right");
-            return;
         } else if (node->right == nullptr && node->left != nullptr) {
             deleteVertexOneSon(node, "left");
-            return;
         } else { // Two sons
             Node *iterator = node->right;
             while (iterator->left != nullptr) iterator = iterator->left;
             swapNodesData(iterator, node);
-
-            Node *parent = iterator->parent;
+            parent = iterator->parent;
             deleteVertex(iterator); // one son or a leaf
-
-            // TODO: update heights properly ???? mabye not needed
-
-            // SOMETHING'S WRONG:
-
-            /*if (parent->left == iterator) {
-                parent->left = nullptr;
-                if (parent->right == nullptr) {
-                    while (parent != node->right) {
-                        parent->h_left--;
-                        parent = parent->parent;
-                    }
-                    parent->h_right--;
-                }
-            } else {
-                parent->right = nullptr;
-                parent->h_right--;
-            }*/
-
-            return;
         }
+        return parent;
     }
 
 public:
@@ -419,13 +405,13 @@ public:
             }
 
             if (abs(p->h_left - p->h_right) > 1) {
-                if (!path.compare(0, 2, "RR")) {
+                if (path.compare(0, 2, "RR") == 0) {
                     roll_RR(p);
-                } else if (!path.compare(0, 2, "LL")) {
+                } else if (path.compare(0, 2, "LL") == 0) {
                     roll_LL(p);
-                } else if (!path.compare(0, 2, "RL")) {
+                } else if (path.compare(0, 2, "RL") == 0) {
                     roll_RL(p);
-                } else if (!path.compare(0, 2, "LR")) {
+                } else if (path.compare(0, 2, "LR") == 0) {
                     roll_LR(p);
                 }
                 break;
@@ -441,10 +427,42 @@ public:
         if (node == nullptr) return false;
         if (node->key1 != key1 || node->key2 != key2) return false;
 
-        Node *parent = node->parent;
-        deleteVertex(node);
+        Node* v = deleteVertex(node);
+        Node *p;
+        string path = "";
+        while (v != root && v != nullptr) {
+            p = v->parent;
+            // TODO: fix heights update
+            if (getHeight(p) >= getHeight(v) + 1) {
+                if (p->right == v) {
+                    p->h_right--;
+                } else {
+                    p->h_left--;
+                }
+            }
 
-        // TODO: complete this function
+            if (p->right == v) {
+                path = "R" + path;
+            } else {
+                path = "L" + path;
+            }
+
+            if (abs(p->h_left - p->h_right) > 1) {
+                int old_p_height = getHeight(p);
+                if (path.compare(0, 2, "RR") == 0) {
+                    roll_RR(p);
+                } else if (path.compare(0, 2, "LL") == 0) {
+                    roll_LL(p);
+                } else if (path.compare(0, 2, "RL") == 0) {
+                    roll_RL(p);
+                } else if (path.compare(0, 2, "LR") == 0) {
+                    roll_LR(p);
+                }
+                if (old_p_height == getHeight(p)) break;
+            } else {
+                v = p;
+            }
+        }
 
         return true;
     }
