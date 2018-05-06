@@ -12,13 +12,11 @@
 
 using std::string;
 
-template<typename T>
+template<typename T, class Key>
 class AVLTree {
     struct Node {
         T data;
-        // TODO: change key to be generic
-        int key1;
-        int key2;
+        Key key;
         Node *parent;
         Node *left;
         int h_left;
@@ -26,8 +24,6 @@ class AVLTree {
         int h_right;
 
         Node() {
-            key1 = -1;
-            key2 = -1;
             parent = nullptr;
             left = nullptr;
             right = nullptr;
@@ -35,10 +31,9 @@ class AVLTree {
             h_left = -1;
         }
 
-        Node(T data, int key1, int key2) {
+        Node(T data, Key key) {
             this->data = data;
-            this->key1 = key1;
-            this->key2 = key2;
+            this->key = key;
             parent = nullptr;
             left = nullptr;
             right = nullptr;
@@ -53,13 +48,12 @@ class AVLTree {
         this->root = root;
     }
 
-    Node *binarySearch(int key1, int key2) {
+    Node *binarySearch(Key key) {
         if (root == nullptr) return nullptr;
         Node *iterator = root;
         while (true) {
-            if (iterator->key1 == key1 && iterator->key2 == key2) break;
-            else if (key1 < iterator->key1 ||
-                     (key1 == iterator->key1 && key2 > iterator->key2)) {
+            if (iterator->key == key) break;
+            else if (key < iterator->key) {
                 if (iterator->left == nullptr) return iterator;
                 iterator = iterator->left;
             } else {
@@ -70,10 +64,9 @@ class AVLTree {
         return iterator;
     }
 
-    Node *createVertex(Node *parent, const T &data, int key1, int key2) {
-        Node *new_node = new Node(data, key1, key2);
-        if (key1 < parent->key1 ||
-            (key1 == parent->key1 && key2 > parent->key2)) {
+    Node *createVertex(Node *parent, const T &data, Key key) {
+        Node *new_node = new Node(data, key);
+        if (key < parent->key) {
             parent->left = new_node;
         } else {
             parent->right = new_node;
@@ -190,29 +183,31 @@ class AVLTree {
     }
 
     static Node **mergeNodeArrays(Node **a, int size_a, Node **b, int size_b) {
-        //vector<Node *>::iterator i = a.begin();
-        //vector<Node *>::iterator j = b.begin();
         Node **result = new Node *[size_a + size_b];
-        while (a != a + size_a && b != b + size_b) {
-            int a_key1 = (*a)->key1;
-            int a_key2 = (*a)->key2;
-            int b_key1 = (*b)->key1;
-            int b_key2 = (*b)->key2;
-            if (b_key1 < a_key1 || (b_key1 == a_key1 && b_key2 > b_key2)) {
-                *result = *a;
-                a++;
+        Node **temp = result;
+        Node **p1 = a;
+        Node **p2 = b;
+        while (p1 != a + size_a && p2 != b + size_b) {
+            Key a_key = (*p1)->key;
+            Key b_key = (*p2)->key;
+            if (a_key > b_key) {
+                *temp = *p2;
+                p2++;
             } else {
-                *result = *b;
-                b++;
+                *temp = *p1;
+                p1++;
             }
+            temp++;
         }
-        while (a != a + size_a) {
-            *result = *a;
-            a++;
+        while (p1 != a + size_a) {
+            *temp = *p1;
+            p1++;
+            temp++;
         }
-        while (b != b + size_b) {
-            *result = *b;
-            b++;
+        while (p2 != b + size_b) {
+            *temp = *p2;
+            p2++;
+            temp++;
         }
         return result;
     }
@@ -220,22 +215,22 @@ class AVLTree {
     static Node **clearSameElements(Node **sorted_array, int size, int *new_size) {
         *new_size = size;
         for (int i = 0; i < size - 1; i++) {
-            if (sorted_array[i] == sorted_array[i + 1]) {
+            if (sorted_array[i]->key == sorted_array[i + 1]->key) {
                 (*new_size)--;
             }
         }
-        Node **result = new Node *[*new_size];
-        Node **p = sorted_array;
-        *result = *p;
-        p++;
 
-        while (p != sorted_array + size) {
-            if (*p != *result) {
-                *result = *p;
-                result++;
+        Node **result = new Node *[*new_size];
+        Node** temp = result;
+        Node **p = sorted_array;
+        while (p != sorted_array + size - 1) {
+            if ((*p)->key != (*(p+1))->key) {
+                *temp = *p;
+                temp++;
             }
             p++;
         }
+        if ((*p)->key != (*(p-1))->key) *temp = *p;
 
         return result;
     }
@@ -265,17 +260,20 @@ class AVLTree {
         if (root == nullptr) return;
 
         removeVerticesFromCompleteTree(root->right, leaves_to_remove);
+        Node* left_son = root->left;
         if (root->left == nullptr && root->right == nullptr && *leaves_to_remove > 0) {
             Node *parent = root->parent;
             if (parent->left == root) {
                 parent->left = nullptr;
+                parent->h_left--;
             } else {
                 parent->right = nullptr;
+                parent->h_right--;
             }
             (*leaves_to_remove)--;
             delete root;
         }
-        removeVerticesFromCompleteTree(root->left, leaves_to_remove);
+        removeVerticesFromCompleteTree(left_son, leaves_to_remove);
     }
 
     static void putValuesInEmptyIncompleteTree(Node *root, Node ***sorted_array) {
@@ -284,8 +282,7 @@ class AVLTree {
         putValuesInEmptyIncompleteTree(root->left, sorted_array);
         Node *current = *(*sorted_array);
         root->data = current->data;
-        root->key1 = current->key1;
-        root->key2 = current->key2;
+        root->key = current->key;
         (*sorted_array)++;
         putValuesInEmptyIncompleteTree(root->right, sorted_array);
     }
@@ -293,7 +290,7 @@ class AVLTree {
     static Node *buildIncompleteTree(Node **sorted_array, int size) {
         int complete_height = (int) (ceil(log2(size)));
         Node *root = buildEmptyCompleteTree(complete_height);
-        int leaves_to_remove = (int) (pow(2, complete_height) - size);
+        int leaves_to_remove = (int) (pow(2, complete_height) - size - 1);
         removeVerticesFromCompleteTree(root, &leaves_to_remove);
         putValuesInEmptyIncompleteTree(root, &sorted_array);
         return root;
@@ -301,16 +298,13 @@ class AVLTree {
 
     void swapNodesData(Node *v1, Node *v2) {
         T temp_data = v1->data;
-        int temp_key1 = v1->key1;
-        int temp_key2 = v1->key2;
+        int temp_key = v1->key;
 
         v1->data = v2->data;
-        v1->key1 = v2->key1;
-        v1->key2 = v2->key2;
+        v1->key = v2->key;
 
         v2->data = temp_data;
-        v2->key1 = temp_key1;
-        v2->key2 = temp_key2;
+        v2->key = temp_key;
     }
 
     void deleteVertexLeaf(Node *node) {
@@ -401,22 +395,22 @@ public:
         deleteTree(root);
     }
 
-    T find(int key1, int key2) {
-        Node *node = binarySearch(key1, key2);
-        if (key1 != node->key1 || key2 != node->key2) {
+    T find(Key key) {
+        Node *node = binarySearch(key);
+        if (key != node->key) {
             throw AVLElementNotFound();
         }
         return node->data;
     }
 
-    bool insert(const T &data, int key1, int key2) {
-        Node *parent = binarySearch(key1, key2);
+    bool insert(const T &data, Key key) {
+        Node *parent = binarySearch(key);
         Node *new_node;
         if (parent != nullptr) {
-            if (parent->key1 == key1 && parent->key2 == key2) return false;
-            new_node = createVertex(parent, data, key1, key2);
+            if (parent->key == key) return false;
+            new_node = createVertex(parent, data, key);
         } else {
-            new_node = new Node(data, key1, key2);
+            new_node = new Node(data, key);
             root = new_node;
         }
 
@@ -461,10 +455,10 @@ public:
         return true;
     }
 
-    bool remove(int key1, int key2) {
-        Node *node = binarySearch(key1, key2);
+    bool remove(Key key) {
+        Node *node = binarySearch(key);
         if (node == nullptr) return false;
-        if (node->key1 != key1 || node->key2 != key2) return false;
+        if (node->key != key) return false;
 
         Node *v = deleteVertex(node);
         Node *p = nullptr;
@@ -500,31 +494,41 @@ public:
     }
 
     static AVLTree merge(const AVLTree &tree1, const AVLTree &tree2) {
+        Node **temp;
+
         int size_a = getSize(tree1.root);
         Node **a = new Node *[size_a];
-        sortToArray(tree1.root, &a);
+        temp = a;
+        sortToArray(tree1.root, &temp);
 
         int size_b = getSize(tree2.root);
         Node **b = new Node *[size_b];
-        sortToArray(tree2.root, &b);
+        temp = b;
+        sortToArray(tree2.root, &temp);
 
         int new_size = 0;
-        Node **temp = mergeNodeArrays(a, size_a, b, size_b);
-        Node **c = clearSameElements(temp, size_a + size_b, &new_size);
+        Node **uncleared_c = mergeNodeArrays(a, size_a, b, size_b);
+        Node **c = clearSameElements(uncleared_c, size_a + size_b, &new_size);
 
-        return AVLTree(buildIncompleteTree(c, new_size));
+        Node *new_root = buildIncompleteTree(c, new_size);
+        delete[] a;
+        delete[] b;
+        delete[] uncleared_c;
+        delete[] c;
+
+        return AVLTree(new_root);
     }
 
     T *inOrderToArray() {
-        T *temp = new T[getSize(root)];
-        T* result = temp;
+        T *result = new T[getSize(root)];
+        T *temp = result;
         inOrderToArrayRecursive(root, &temp);
         return result;
     }
 
     T *preOrderToArray() {
         T *result = new T[getSize(root)];
-        T* temp = result;
+        T *temp = result;
         preOrderToArrayRecursive(root, &temp);
         return result;
     }

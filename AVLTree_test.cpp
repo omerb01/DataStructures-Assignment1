@@ -22,28 +22,33 @@ bool testInsertRL() {
 }
 
 bool testInsertLL() {
-    AVLTree<int> tree1;
-    tree1.insert(2, 2, 0);
-    tree1.insert(1, 1, 0);
-    tree1.insert(7, 7, 0);
-    tree1.insert(5, 5, 0);
+    AVLTree<int, int> tree1;
+    tree1.insert(2, 2);
+    tree1.insert(1, 1);
+    tree1.insert(7, 7);
+    tree1.insert(5, 5);
 
     // LL roll
-    tree1.insert(3, 3, 0);
+    tree1.insert(3, 3);
     int *inArray1 = tree1.inOrderToArray();
     int *preArray1 = tree1.preOrderToArray();
 
-    AVLTree<int> tree2;
-    tree2.insert(2, 2, 0);
-    tree2.insert(5, 5, 0);
-    tree2.insert(1, 1, 0);
-    tree2.insert(7, 7, 0);
-    tree2.insert(3, 3, 0);
+    AVLTree<int, int> tree2;
+    tree2.insert(2, 2);
+    tree2.insert(5, 5);
+    tree2.insert(1, 1);
+    tree2.insert(7, 7);
+    tree2.insert(3, 3);
     int *inArray2 = tree2.inOrderToArray();
     int *preArray2 = tree2.preOrderToArray();
 
     ASSERT_TRUE(areArraysEqual(inArray1, inArray2, 5));
     ASSERT_TRUE(areArraysEqual(preArray1, preArray2, 5));
+
+    delete[] inArray1;
+    delete[] inArray2;
+    delete[] preArray1;
+    delete[] preArray2;
 
     return true;
 }
@@ -68,7 +73,28 @@ bool testRemoveLR() {
     return true;
 }
 
+bool testFind() {
+    return true;
+}
+
+bool testMerge() {
+    AVLTree<int, int> tree1;
+    tree1.insert(10, 10);
+    tree1.insert(8, 8);
+    tree1.insert(12, 12);
+
+    AVLTree<int, int> tree2;
+    tree2.insert(10, 10);
+    tree2.insert(9, 9);
+    tree2.insert(11, 11);
+
+    AVLTree<int, int> merged_tree = AVLTree<int, int>::merge(tree1, tree2);
+
+    return true;
+}
+
 int main() {
     RUN_TEST(testInsertLL);
+    RUN_TEST(testMerge);
     return 0;
 }
