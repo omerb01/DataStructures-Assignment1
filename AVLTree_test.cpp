@@ -49,7 +49,6 @@ bool testInsertLL() {
     delete[] inArray2;
     delete[] preArray1;
     delete[] preArray2;
-
     return true;
 }
 
@@ -106,6 +105,10 @@ bool testMerge() {
     ASSERT_TRUE(areArraysEqual(inArray1, inArray2, 5));
     ASSERT_TRUE(areArraysEqual(preArray1, preArray2, 5));
 
+    delete[] inArray1;
+    delete[] inArray2;
+    delete[] preArray1;
+    delete[] preArray2;
     return true;
 }
 
