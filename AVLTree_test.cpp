@@ -6,11 +6,31 @@
 #include <iostream>
 #include "AVLTree.h"
 
-bool areArraysEqual(int *a, int *b, int n) {
+template<typename T>
+bool areArraysEqual(T *a, T *b, int n) {
+    if (a == nullptr && b == nullptr) return true;
+    if (a == nullptr || b == nullptr) return false;
     for (int i = 0; i < n; i++) {
         if (a[i] != b[i]) return false;
     }
     return true;
+}
+
+template<typename T, class Key>
+bool areTreesEqual(const AVLTree<T, Key> &tree1, const AVLTree<T, Key> &tree2, int size) {
+    T *inArray1 = tree1.inOrderToArray();
+    T *preArray1 = tree1.preOrderToArray();
+    T *inArray2 = tree2.inOrderToArray();
+    T *preArray2 = tree2.preOrderToArray();
+
+    bool result = areArraysEqual(inArray1, inArray2, size) &&
+                  areArraysEqual(preArray1, preArray2, size);
+
+    delete[] inArray1;
+    delete[] inArray2;
+    delete[] preArray1;
+    delete[] preArray2;
+    return result;
 }
 
 bool testInsertRR() {
@@ -30,8 +50,6 @@ bool testInsertLL() {
 
     // LL roll
     tree1.insert(3, 3);
-    int *inArray1 = tree1.inOrderToArray();
-    int *preArray1 = tree1.preOrderToArray();
 
     AVLTree<int, int> tree2;
     tree2.insert(2, 2);
@@ -39,16 +57,9 @@ bool testInsertLL() {
     tree2.insert(1, 1);
     tree2.insert(7, 7);
     tree2.insert(3, 3);
-    int *inArray2 = tree2.inOrderToArray();
-    int *preArray2 = tree2.preOrderToArray();
 
-    ASSERT_TRUE(areArraysEqual(inArray1, inArray2, 5));
-    ASSERT_TRUE(areArraysEqual(preArray1, preArray2, 5));
+    ASSERT_TRUE(areTreesEqual(tree1, tree2, 5));
 
-    delete[] inArray1;
-    delete[] inArray2;
-    delete[] preArray1;
-    delete[] preArray2;
     return true;
 }
 
@@ -87,10 +98,7 @@ bool testMerge() {
     tree2.insert(9, 9);
     tree2.insert(11, 11);
 
-    AVLTree<int, int> merged_tree = AVLTree<int, int>::merge(tree1, tree2);
-
-    int *inArray1 = merged_tree.inOrderToArray();
-    int *preArray1 = merged_tree.preOrderToArray();
+    AVLTree<int, int> merged_tree_1_2 = AVLTree<int, int>::merge(tree1, tree2);
 
     AVLTree<int, int> tree3;
     tree3.insert(11, 11);
@@ -99,16 +107,18 @@ bool testMerge() {
     tree3.insert(10, 10);
     tree3.insert(8, 8);
 
-    int *inArray2 = tree3.inOrderToArray();
-    int *preArray2 = tree3.preOrderToArray();
+    ASSERT_TRUE(areTreesEqual(merged_tree_1_2, tree3, 5));
 
-    ASSERT_TRUE(areArraysEqual(inArray1, inArray2, 5));
-    ASSERT_TRUE(areArraysEqual(preArray1, preArray2, 5));
+    AVLTree<int, int> empty_tree1;
+    AVLTree<int, int> empty_tree2;
+    AVLTree<int, int> empty_merged_tree = AVLTree<int, int>::merge(empty_tree1, empty_tree2);
+    ASSERT_TRUE(areTreesEqual(empty_tree1, empty_merged_tree, 0));
 
-    delete[] inArray1;
-    delete[] inArray2;
-    delete[] preArray1;
-    delete[] preArray2;
+    // TODO: check copy constructor, why it doesnt copy properly
+    AVLTree<int, int> merged_tree_1_empty = AVLTree<int, int>::merge(tree1, empty_tree2);
+
+    ASSERT_TRUE(areTreesEqual(merged_tree_1_empty,tree1,3));
+
     return true;
 }
 

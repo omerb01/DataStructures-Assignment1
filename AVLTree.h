@@ -388,10 +388,10 @@ class AVLTree {
         Node *copy_node = new Node(*root);
 
         copy_node->right = copyTreeRecursive(root->right);
-        copy_node->right->parent = copy_node;
+        if(copy_node->right != nullptr) copy_node->right->parent = copy_node;
 
         copy_node->left = copyTreeRecursive(root->right);
-        copy_node->left->parent = copy_node;
+        if(copy_node->left != nullptr) copy_node->left->parent = copy_node;
 
         return copy_node;
     }
@@ -422,7 +422,7 @@ public:
     }
 
     AVLTree(const AVLTree &tree) {
-        Node *tree_copy = copyTreeRecursive(root);
+        Node *tree_copy = copyTreeRecursive(tree.root);
         root = tree_copy;
     }
 
@@ -529,6 +529,9 @@ public:
     static AVLTree merge(const AVLTree &tree1, const AVLTree &tree2) {
         Node **temp;
 
+        if(tree1.root == nullptr) return AVLTree(tree2);
+        if(tree2.root == nullptr) return AVLTree(tree1);
+
         int size_a = getSize(tree1.root);
         Node **a = new Node *[size_a];
         temp = a;
@@ -552,14 +555,16 @@ public:
         return AVLTree(new_root);
     }
 
-    T *inOrderToArray() {
+    T *inOrderToArray() const {
+        if(root == nullptr) return nullptr;
         T *result = new T[getSize(root)];
         T *temp = result;
         inOrderToArrayRecursive(root, &temp);
         return result;
     }
 
-    T *preOrderToArray() {
+    T *preOrderToArray() const {
+        if(root == nullptr) return nullptr;
         T *result = new T[getSize(root)];
         T *temp = result;
         preOrderToArrayRecursive(root, &temp);
