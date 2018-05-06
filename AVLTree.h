@@ -40,6 +40,18 @@ class AVLTree {
             h_right = -1;
             h_left = -1;
         }
+
+        Node(const Node &node) {
+            data = node.data;
+            key = node.key;
+            h_left = node.h_left;
+            h_right = node.h_right;
+            parent = nullptr;
+            left = nullptr;
+            right = nullptr;
+        }
+
+        Node &operator=(const Node &node) = delete;
     };
 
     Node *root;
@@ -221,16 +233,16 @@ class AVLTree {
         }
 
         Node **result = new Node *[*new_size];
-        Node** temp = result;
+        Node **temp = result;
         Node **p = sorted_array;
         while (p != sorted_array + size - 1) {
-            if ((*p)->key != (*(p+1))->key) {
+            if ((*p)->key != (*(p + 1))->key) {
                 *temp = *p;
                 temp++;
             }
             p++;
         }
-        if ((*p)->key != (*(p-1))->key) *temp = *p;
+        if ((*p)->key != (*(p - 1))->key) *temp = *p;
 
         return result;
     }
@@ -260,7 +272,7 @@ class AVLTree {
         if (root == nullptr) return;
 
         removeVerticesFromCompleteTree(root->right, leaves_to_remove);
-        Node* left_son = root->left;
+        Node *left_son = root->left;
         if (root->left == nullptr && root->right == nullptr && *leaves_to_remove > 0) {
             Node *parent = root->parent;
             if (parent->left == root) {
@@ -363,11 +375,23 @@ class AVLTree {
         return vertex->h_left - vertex->h_right;
     }
 
-    static void deleteTree(Node *root) {
+    static void deleteTreeRecursive(Node *root) {
         if (root == nullptr) return;
-        deleteTree(root->left);
-        deleteTree(root->right);
+        deleteTreeRecursive(root->left);
+        deleteTreeRecursive(root->right);
         delete root;
+    }
+
+    static Node *copyTreeRecursive(Node *root) {
+        if (root == nullptr) return nullptr;
+
+        Node *copy_node = new Node(*root);
+
+        copy_node->right = copyTreeRecursive(root->right);
+        copy_node->right->parent = copy_node;
+
+        copy_node->left = copyTreeRecursive(root->right);
+        copy_node->left->parent = copy_node;
     }
 
     static void inOrderToArrayRecursive(Node *root, T **array) {
@@ -392,8 +416,15 @@ public:
     }
 
     ~AVLTree() {
-        deleteTree(root);
+        deleteTreeRecursive(root);
     }
+
+    AVLTree(const AVLTree &tree) {
+        Node *tree_copy = copyTreeRecursive(root);
+        root = tree_copy;
+    }
+
+    AVLTree &operator=(const AVLTree &tree) = delete;
 
     T find(Key key) {
         Node *node = binarySearch(key);

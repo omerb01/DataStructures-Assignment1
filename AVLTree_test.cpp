@@ -90,6 +90,22 @@ bool testMerge() {
 
     AVLTree<int, int> merged_tree = AVLTree<int, int>::merge(tree1, tree2);
 
+    int *inArray1 = merged_tree.inOrderToArray();
+    int *preArray1 = merged_tree.preOrderToArray();
+
+    AVLTree<int, int> tree3;
+    tree3.insert(11, 11);
+    tree3.insert(12, 12);
+    tree3.insert(9, 9);
+    tree3.insert(10, 10);
+    tree3.insert(8, 8);
+
+    int *inArray2 = tree3.inOrderToArray();
+    int *preArray2 = tree3.preOrderToArray();
+
+    ASSERT_TRUE(areArraysEqual(inArray1, inArray2, 5));
+    ASSERT_TRUE(areArraysEqual(preArray1, preArray2, 5));
+
     return true;
 }
 
