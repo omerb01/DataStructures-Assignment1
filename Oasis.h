@@ -49,6 +49,13 @@ class Oasis {
             challenges = -1;
         }
 
+        Player(int id, int coins = 0) {
+            this->id = id;
+            clan = -1;
+            this->coins = coins;
+            challenges = 0;
+        }
+
         Player &operator=(const Player &player) = delete;
     };
 
@@ -65,6 +72,12 @@ class Oasis {
             best_player = nullptr;
             members_size = -1;
         };
+
+        explicit Clan(int id) {
+            this->id = id;
+            best_player = nullptr;
+            members_size = 0;
+        }
 
         Clan &operator=(const Clan &player) = delete;
     };
