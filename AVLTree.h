@@ -99,26 +99,18 @@ class AVLTree {
         new_parent = unbalanced->left; // new parent - left node of the unbalanced node
         unbalanced->left = new_parent->right; // if new node has right children, move to to old parent
         unbalanced->h_left = new_parent->h_right;
-        if (unbalanced->parent == nullptr){
+
+        if (unbalanced->parent == nullptr) {
             root = new_parent;
-        }else if (unbalanced->parent->left == unbalanced) {
+        } else if (unbalanced->parent->left == unbalanced) {
             unbalanced->parent->left = new_parent;
         } else {
             unbalanced->parent->right = new_parent;
         }
-        // previous was:
-        /*if (unbalanced->parent != nullptr) {
-            if (unbalanced->parent->left == unbalanced) {
-                unbalanced->parent->left = new_parent;
-            } else {
-                unbalanced->parent->right = new_parent;
-            }
-        }*/
+
         new_parent->right = unbalanced;
         new_parent->h_right = getHeight(unbalanced);
-
         new_parent->parent = unbalanced->parent;
-
         unbalanced->parent = new_parent;
     }
 
@@ -128,19 +120,18 @@ class AVLTree {
         new_parent = unbalanced->right; // new parent - left node of the unbalanced node
         unbalanced->right = new_parent->left; // if new node has right children, move to to old parent
         unbalanced->h_right = new_parent->h_left;
-        if (unbalanced->parent == nullptr){
+
+        if (unbalanced->parent == nullptr) {
             root = new_parent;
-        }
-        else if (unbalanced->parent->left == unbalanced) {
+        } else if (unbalanced->parent->left == unbalanced) {
             unbalanced->parent->left = new_parent;
         } else {
             unbalanced->parent->right = new_parent;
         }
+
         new_parent->left = unbalanced;
         new_parent->h_left = getHeight(unbalanced);
-
         new_parent->parent = unbalanced->parent;
-
         unbalanced->parent = new_parent;
     }
 
@@ -163,11 +154,11 @@ class AVLTree {
         C->right = B;
         C->h_right = getHeight(B);
         C->parent = A->parent;
-        if (C->parent != nullptr){
-            if(A->parent->right==A){
-                A->parent->right=C;
-            }else if(A->parent->left==A){
-                A->parent->left=C;
+        if (C->parent != nullptr) {
+            if (A->parent->right == A) {
+                A->parent->right = C;
+            } else if (A->parent->left == A) {
+                A->parent->left = C;
             }
         }
         A->parent = C;
@@ -193,7 +184,13 @@ class AVLTree {
         C->left = B;
         C->h_left = getHeight(B);
         C->parent = A->parent;
-        if (C->parent != nullptr) A->parent->right = C;
+        if (C->parent != nullptr) {
+            if (A->parent->right == A) {
+                A->parent->right = C;
+            } else if (A->parent->left == A) {
+                A->parent->left = C;
+            }
+        }
         A->parent = C;
         B->parent = C;
     }
@@ -405,10 +402,10 @@ class AVLTree {
         Node *copy_node = new Node(*root);
 
         copy_node->right = copyTreeRecursive(root->right);
-        if(copy_node->right != nullptr) copy_node->right->parent = copy_node;
+        if (copy_node->right != nullptr) copy_node->right->parent = copy_node;
 
-        copy_node->left = copyTreeRecursive(root->right);
-        if(copy_node->left != nullptr) copy_node->left->parent = copy_node;
+        copy_node->left = copyTreeRecursive(root->left);
+        if (copy_node->left != nullptr) copy_node->left->parent = copy_node;
 
         return copy_node;
     }
@@ -546,8 +543,8 @@ public:
     static AVLTree merge(const AVLTree &tree1, const AVLTree &tree2) {
         Node **temp;
 
-        if(tree1.root == nullptr) return AVLTree(tree2);
-        if(tree2.root == nullptr) return AVLTree(tree1);
+        if (tree1.root == nullptr) return AVLTree(tree2);
+        if (tree2.root == nullptr) return AVLTree(tree1);
 
         int size_a = getSize(tree1.root);
         Node **a = new Node *[size_a];
@@ -573,7 +570,7 @@ public:
     }
 
     T *inOrderToArray() const {
-        if(root == nullptr) return nullptr;
+        if (root == nullptr) return nullptr;
         T *result = new T[getSize(root)];
         T *temp = result;
         inOrderToArrayRecursive(root, &temp);
@@ -581,7 +578,7 @@ public:
     }
 
     T *preOrderToArray() const {
-        if(root == nullptr) return nullptr;
+        if (root == nullptr) return nullptr;
         T *result = new T[getSize(root)];
         T *temp = result;
         preOrderToArrayRecursive(root, &temp);
