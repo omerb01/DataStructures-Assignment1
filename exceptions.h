@@ -17,4 +17,8 @@
 NEW_EXCEPTION(AVLTreeException, std::exception);
 NEW_EXCEPTION(AVLElementNotFound, AVLTreeException);
 
+NEW_EXCEPTION(OasisException, std::exception);
+NEW_EXCEPTION(OasisInvalidInput, OasisException);
+NEW_EXCEPTION(OasisFailure, OasisException);
+
 #endif //DATASTRUCTURES_HW1_EXCEPTIONS_H

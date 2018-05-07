@@ -83,19 +83,19 @@ public:
 
     Oasis &operator=(const Oasis &oasis) = delete;
 
-    void addPlayer(int playerID, int initialCoins);
+    void addPlayer(int playerID, int initialCoins); // ILYA
 
     void addClan(int clanID);
 
-    void joinClan(int playerID, int clanID);
+    void joinClan(int playerID, int clanID); // ILYA
 
     int getBestPlayer(int clanID, int playerID);
 
-    void completeChallenge(int playerID, int coins);
+    void completeChallenge(int playerID, int coins); // ILYA
 
     void getScoreboard(int clanID, int **players, int *numOfPlayers);
 
-    void uniteClans(int clanID1, int clanID2);
+    void uniteClans(int clanID1, int clanID2); // ILYA
 };
 
 #endif //DATASTRUCTURES_HW1_OASIS_H
