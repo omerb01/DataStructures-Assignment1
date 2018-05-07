@@ -99,18 +99,26 @@ class AVLTree {
         new_parent = unbalanced->left; // new parent - left node of the unbalanced node
         unbalanced->left = new_parent->right; // if new node has right children, move to to old parent
         unbalanced->h_left = new_parent->h_right;
-        if (unbalanced->parent != nullptr) {
+        if (unbalanced->parent == nullptr){
+            root = new_parent;
+        }else if (unbalanced->parent->left == unbalanced) {
+            unbalanced->parent->left = new_parent;
+        } else {
+            unbalanced->parent->right = new_parent;
+        }
+        // previous was:
+        /*if (unbalanced->parent != nullptr) {
             if (unbalanced->parent->left == unbalanced) {
                 unbalanced->parent->left = new_parent;
             } else {
                 unbalanced->parent->right = new_parent;
             }
-        }
+        }*/
         new_parent->right = unbalanced;
         new_parent->h_right = getHeight(unbalanced);
 
         new_parent->parent = unbalanced->parent;
-        if (unbalanced->parent == nullptr) root = new_parent;
+
         unbalanced->parent = new_parent;
     }
 
@@ -120,7 +128,10 @@ class AVLTree {
         new_parent = unbalanced->right; // new parent - left node of the unbalanced node
         unbalanced->right = new_parent->left; // if new node has right children, move to to old parent
         unbalanced->h_right = new_parent->h_left;
-        if (unbalanced->parent->left == unbalanced) {
+        if (unbalanced->parent == nullptr){
+            root = new_parent;
+        }
+        else if (unbalanced->parent->left == unbalanced) {
             unbalanced->parent->left = new_parent;
         } else {
             unbalanced->parent->right = new_parent;
@@ -129,7 +140,7 @@ class AVLTree {
         new_parent->h_left = getHeight(unbalanced);
 
         new_parent->parent = unbalanced->parent;
-        if (unbalanced->parent == nullptr) root = new_parent;
+
         unbalanced->parent = new_parent;
     }
 
@@ -152,7 +163,13 @@ class AVLTree {
         C->right = B;
         C->h_right = getHeight(B);
         C->parent = A->parent;
-        if (C->parent != nullptr) A->parent->left = C;
+        if (C->parent != nullptr){
+            if(A->parent->right==A){
+                A->parent->right=C;
+            }else if(A->parent->left==A){
+                A->parent->left=C;
+            }
+        }
         A->parent = C;
         B->parent = C;
     }

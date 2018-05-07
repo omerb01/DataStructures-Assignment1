@@ -34,10 +34,50 @@ bool areTreesEqual(const AVLTree<T, Key> &tree1, const AVLTree<T, Key> &tree2, i
 }
 
 bool testInsertRR() {
+    AVLTree<int, int> tree1;
+    AVLTree<int, int> tree2;
+
+    tree1.insert(6, 6);
+    tree1.insert(8, 8);
+    tree1.insert(1, 1);
+    tree1.insert(7, 7);
+    tree1.insert(9, 9);
+
+    //Roll RR
+    tree1.insert(10, 10);
+
+
+    tree2.insert(8, 8);
+    tree2.insert(1, 1);
+    tree2.insert(7, 7);
+    tree2.insert(10, 10);
+    tree2.insert(9, 9);
+    tree2.insert(6, 6);
+
+    ASSERT_FALSE(areTreesEqual(tree1, tree2, 6));
     return true;
 }
 
 bool testInsertRL() {
+    AVLTree<int, int> tree1;
+    AVLTree<int, int> tree2;
+
+    tree1.insert(6, 6);
+    tree1.insert(1, 1);
+    tree1.insert(10, 10);
+    tree1.insert(9, 9);
+    tree1.insert(12, 12);
+
+    //Roll RL
+    tree1.insert(8, 8);
+
+    tree2.insert(12, 12);
+    tree2.insert(10, 10);
+    tree2.insert(6, 6);
+    tree2.insert(1, 1);
+    tree2.insert(8, 8);
+    tree2.insert(9, 9);
+    ASSERT_FALSE(areTreesEqual(tree1, tree2, 5));
     return true;
 }
 
@@ -64,22 +104,154 @@ bool testInsertLL() {
 }
 
 bool testInsertLR() {
+    AVLTree<int, int> tree1;
+    AVLTree<int, int> tree2;
+
+    tree1.insert(5, 5);
+    tree1.insert(1, 1);
+    tree1.insert(6, 6);
+    tree1.insert(0, 0);
+    tree1.insert(2, 2);
+
+    //LR roll
+    tree1.insert(3, 3);
+
+    tree2.insert(2, 2);
+    tree2.insert(0, 0);
+    tree2.insert(1, 1);
+    tree2.insert(5, 5);
+    tree2.insert(3, 3);
+    tree2.insert(6, 6);
+
+
+    ASSERT_FALSE(areTreesEqual(tree1, tree2, 6));
+
     return true;
 }
 
 bool testRemoveRR() {
+    AVLTree<int, int> tree1;
+    AVLTree<int, int> tree2;
+
+    tree1.insert(6, 6);
+    tree1.insert(8, 8);
+    tree1.insert(1, 1);
+    tree1.insert(7, 7);
+    tree1.insert(10, 10);
+    tree1.insert(11, 11);
+    tree1.insert(9, 9);
+    tree1.insert(12, 12);
+    //Roll RR
+    tree1.remove(10);
+
+    tree2.insert(8, 8);
+    tree2.insert(6, 6);
+
+    tree2.insert(11, 11);
+    tree2.insert(1, 1);
+    tree2.insert(7, 7);
+    tree2.insert(9, 9);
+    tree2.insert(12, 12);
+
+    ASSERT_TRUE(areTreesEqual(tree1, tree2, 7));
     return true;
 }
 
 bool testRemoveRL() {
+    AVLTree<int, int> tree1;
+    AVLTree<int, int> tree2;
+
+    tree1.insert(5, 5);
+    tree1.insert(2, 2);
+    tree1.insert(8, 8);
+    tree1.insert(4, 4);
+    tree1.insert(6, 6);
+    tree1.insert(10, 10);
+    tree1.insert(1, 1);
+    tree1.insert(3, 3);
+    tree1.insert(7, 7);
+    tree1.insert(9, 9);
+    tree1.insert(12, 12);
+    tree1.insert(11, 11);
+    //Roll RL
+    tree1.remove(1);
+
+    tree2.insert(8,8);
+    tree2.insert(5,5);
+    tree2.insert(10,10);
+    tree2.insert(3,3);
+    tree2.insert(6,6);
+    tree2.insert(9,9);
+    tree2.insert(12,12);
+    tree2.insert(2,2);
+    tree2.insert(4,4);
+    tree2.insert(7,7);
+    tree2.insert(11,11);
+
+
+    ASSERT_TRUE(areTreesEqual(tree1, tree2, 11));
     return true;
 }
 
 bool testRemoveLL() {
+    AVLTree<int, int> tree1;
+    AVLTree<int, int> tree2;
+
+    tree1.insert(5, 5);
+    tree1.insert(3, 3);
+    tree1.insert(8, 8);
+    tree1.insert(2, 2);
+    tree1.insert(4, 4);
+    tree1.insert(7, 7);
+    tree1.insert(11, 11);
+    tree1.insert(1, 1);
+    tree1.insert(6, 6);
+    tree1.insert(10, 10);
+    tree1.insert(12, 12);
+    tree1.insert(9, 9);
+
+    // Roll LL:
+    tree1.remove(4);
+
+    tree2.insert(8,8);
+    tree2.insert(5,5);
+    tree2.insert(11,11);
+    tree2.insert(2,2);
+    tree2.insert(7,7);
+    tree2.insert(10,10);
+    tree2.insert(12,12);
+    tree2.insert(1,1);
+    tree2.insert(3,3);
+    tree2.insert(6,6);
+    tree2.insert(9,9);
+
+    ASSERT_TRUE(areTreesEqual(tree1, tree2, 11));
     return true;
 }
 
 bool testRemoveLR() {
+    AVLTree<int, int> tree1;
+    AVLTree<int, int> tree2;
+
+    tree1.insert(10,10);
+    tree1.insert(1,1);
+    tree1.insert(12,12);
+    tree1.insert(0,0);
+    tree1.insert(2,2);
+    tree1.insert(13,13);
+    tree1.insert(5,5);
+    tree1.insert(4,4);
+
+    //LR Roll:
+    tree1.remove(13);
+
+    tree2.insert(4,4);
+    tree2.insert(1,1);
+    tree2.insert(10,10);
+    tree2.insert(0,0);
+    tree2.insert(2,2);
+    tree2.insert(5,5);
+    tree2.insert(12,12);
     return true;
 }
 
@@ -124,6 +296,13 @@ bool testMerge() {
 
 int main() {
     RUN_TEST(testInsertLL);
+    RUN_TEST(testInsertLR);
+    RUN_TEST(testInsertRR);
+    RUN_TEST(testInsertRL);
+    RUN_TEST(testRemoveRR);
+    RUN_TEST(testRemoveRL);
+    RUN_TEST(testRemoveLL);
+    RUN_TEST(testRemoveLR);
     RUN_TEST(testMerge);
     return 0;
 }
