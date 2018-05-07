@@ -15,7 +15,7 @@ using std::string;
 template<typename T, class Key>
 class AVLTree {
     struct Node {
-        T data;
+        T* data;
         Key key;
         Node *parent;
         Node *left;
@@ -24,6 +24,7 @@ class AVLTree {
         int h_right;
 
         Node() {
+            data = nullptr;
             parent = nullptr;
             left = nullptr;
             right = nullptr;
@@ -32,7 +33,7 @@ class AVLTree {
         }
 
         Node(T data, Key key) {
-            this->data = data;
+            this->data = new T(data);
             this->key = key;
             parent = nullptr;
             left = nullptr;
@@ -42,13 +43,17 @@ class AVLTree {
         }
 
         Node(const Node &node) {
-            data = node.data;
+            data = new T(*node.data);
             key = node.key;
             h_left = node.h_left;
             h_right = node.h_right;
             parent = nullptr;
             left = nullptr;
             right = nullptr;
+        }
+
+        ~Node() {
+            delete data;
         }
 
         Node &operator=(const Node &node) = delete;
@@ -323,7 +328,7 @@ class AVLTree {
     }
 
     void swapNodesData(Node *v1, Node *v2) {
-        T temp_data = v1->data;
+        T* temp_data = v1->data;
         int temp_key = v1->key;
 
         v1->data = v2->data;
@@ -413,14 +418,14 @@ class AVLTree {
     static void inOrderToArrayRecursive(Node *root, T **array) {
         if (root == nullptr) return;
         inOrderToArrayRecursive(root->left, array);
-        **array = root->data;
+        **array = *(root->data);
         (*array)++;
         inOrderToArrayRecursive(root->right, array);
     }
 
     static void preOrderToArrayRecursive(Node *root, T **array) {
         if (root == nullptr) return;
-        **array = root->data;
+        **array = *(root->data);
         (*array)++;
         preOrderToArrayRecursive(root->left, array);
         preOrderToArrayRecursive(root->right, array);
@@ -447,7 +452,7 @@ public:
         if (key != node->key) {
             throw AVLElementNotFound();
         }
-        return node->data;
+        return *(node->data);
     }
 
     bool insert(const T &data, Key key) {
@@ -583,6 +588,10 @@ public:
         T *temp = result;
         preOrderToArrayRecursive(root, &temp);
         return result;
+    }
+
+    int getVerticesNumber() const {
+        return getSize(root);
     }
 };
 
