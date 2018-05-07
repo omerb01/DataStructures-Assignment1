@@ -13,12 +13,15 @@ class DoubleKey {
 
 public:
 
+    DoubleKey() {
+        key1 = -1;
+        key2 = -1;
+    }
+
     DoubleKey(int key1, int key2) {
         this->key1 = key1;
         this->key2 = key2;
     }
-
-    DoubleKey &operator=(const DoubleKey &key) = delete;
 
     bool operator==(const DoubleKey &key);
 
@@ -35,12 +38,12 @@ public:
 
 class Oasis {
     class Player {
+    public:
+
         int id;
         int clan;
         int coins;
         int challenges;
-
-    public:
 
         Player() {
             id = -1;
@@ -60,12 +63,12 @@ class Oasis {
     };
 
     class Clan {
+    public:
+
         int id;
         Player *best_player;
         int members_size;
         AVLTree<Player *, DoubleKey> members_coins;
-
-    public:
 
         Clan() {
             id = -1;
@@ -102,7 +105,7 @@ public:
 
     void joinClan(int playerID, int clanID); // ILYA
 
-    int getBestPlayer(int clanID, int playerID);
+    int getBestPlayer(int clanID);
 
     void completeChallenge(int playerID, int coins); // ILYA
 
