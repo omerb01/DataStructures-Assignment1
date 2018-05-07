@@ -16,7 +16,7 @@ template<typename T, class Key>
 class AVLTree {
     struct Node {
         T* data;
-        Key key;
+        Key* key;
         Node *parent;
         Node *left;
         int h_left;
@@ -25,6 +25,7 @@ class AVLTree {
 
         Node() {
             data = nullptr;
+            key = nullptr;
             parent = nullptr;
             left = nullptr;
             right = nullptr;
@@ -34,7 +35,7 @@ class AVLTree {
 
         Node(T data, Key key) {
             this->data = new T(data);
-            this->key = key;
+            this->key = new Key(key);
             parent = nullptr;
             left = nullptr;
             right = nullptr;
@@ -44,7 +45,7 @@ class AVLTree {
 
         Node(const Node &node) {
             data = new T(*node.data);
-            key = node.key;
+            key = new Key(*node.key);
             h_left = node.h_left;
             h_right = node.h_right;
             parent = nullptr;
@@ -54,6 +55,7 @@ class AVLTree {
 
         ~Node() {
             delete data;
+            delete key;
         }
 
         Node &operator=(const Node &node) = delete;
@@ -69,8 +71,8 @@ class AVLTree {
         if (root == nullptr) return nullptr;
         Node *iterator = root;
         while (true) {
-            if (iterator->key == key) break;
-            else if (key < iterator->key) {
+            if (*iterator->key == key) break;
+            else if (key < *iterator->key) {
                 if (iterator->left == nullptr) return iterator;
                 iterator = iterator->left;
             } else {
@@ -83,7 +85,7 @@ class AVLTree {
 
     Node *createVertex(Node *parent, const T &data, Key key) {
         Node *new_node = new Node(data, key);
-        if (key < parent->key) {
+        if (key < *parent->key) {
             parent->left = new_node;
         } else {
             parent->right = new_node;
@@ -219,8 +221,8 @@ class AVLTree {
         Node **p1 = a;
         Node **p2 = b;
         while (p1 != a + size_a && p2 != b + size_b) {
-            Key a_key = (*p1)->key;
-            Key b_key = (*p2)->key;
+            Key a_key = *((*p1)->key);
+            Key b_key = *((*p2)->key);
             if (a_key > b_key) {
                 *temp = *p2;
                 p2++;
@@ -246,7 +248,7 @@ class AVLTree {
     static Node **clearSameElements(Node **sorted_array, int size, int *new_size) {
         *new_size = size;
         for (int i = 0; i < size - 1; i++) {
-            if (sorted_array[i]->key == sorted_array[i + 1]->key) {
+            if (*(sorted_array[i]->key) == *(sorted_array[i + 1]->key)) {
                 (*new_size)--;
             }
         }
@@ -255,13 +257,13 @@ class AVLTree {
         Node **temp = result;
         Node **p = sorted_array;
         while (p != sorted_array + size - 1) {
-            if ((*p)->key != (*(p + 1))->key) {
+            if (*((*p)->key) != *((*(p + 1))->key)) {
                 *temp = *p;
                 temp++;
             }
             p++;
         }
-        if ((*p)->key != (*(p - 1))->key) *temp = *p;
+        if (*((*p)->key) != *((*(p - 1))->key)) *temp = *p;
 
         return result;
     }
@@ -329,7 +331,7 @@ class AVLTree {
 
     void swapNodesData(Node *v1, Node *v2) {
         T* temp_data = v1->data;
-        int temp_key = v1->key;
+        Key* temp_key = v1->key;
 
         v1->data = v2->data;
         v1->key = v2->key;
@@ -449,7 +451,7 @@ public:
 
     T find(Key key) {
         Node *node = binarySearch(key);
-        if (key != node->key) {
+        if (key != *node->key) {
             throw AVLElementNotFound();
         }
         return *(node->data);
@@ -459,7 +461,7 @@ public:
         Node *parent = binarySearch(key);
         Node *new_node;
         if (parent != nullptr) {
-            if (parent->key == key) return false;
+            if (*parent->key == key) return false;
             new_node = createVertex(parent, data, key);
         } else {
             new_node = new Node(data, key);
@@ -510,7 +512,7 @@ public:
     bool remove(Key key) {
         Node *node = binarySearch(key);
         if (node == nullptr) return false;
-        if (node->key != key) return false;
+        if (*node->key != key) return false;
 
         Node *v = deleteVertex(node);
         Node *p = nullptr;
