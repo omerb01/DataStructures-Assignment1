@@ -5,6 +5,7 @@
 #include "testMacros.h"
 #include <iostream>
 #include "AVLTree.h"
+#include "exceptions.h"
 
 template<typename T>
 bool areArraysEqual(T *a, T *b, int n) {
@@ -256,6 +257,22 @@ bool testRemoveLR() {
 }
 
 bool testFind() {
+    AVLTree<int, int> tree1;
+    tree1.insert(10,10);
+    tree1.insert(1,1);
+    tree1.insert(12,12);
+    tree1.insert(0,0);
+    tree1.insert(2,2);
+    tree1.insert(13,13);
+    tree1.insert(5,5);
+    tree1.insert(4,4);
+
+    ASSERT_EXCEPTION(tree1.find(14), AVLElementNotFound);
+    ASSERT_EXCEPTION(tree1.find(300), AVLElementNotFound);
+    ASSERT_EXCEPTION(tree1.find(14), AVLElementNotFound);
+    ASSERT_TRUE(tree1.find(10) == 10);
+    ASSERT_TRUE(tree1.find(13) == 13);
+    ASSERT_TRUE(tree1.find(1) == 1);
     return true;
 }
 
@@ -286,9 +303,7 @@ bool testMerge() {
     AVLTree<int, int> empty_merged_tree = AVLTree<int, int>::merge(empty_tree1, empty_tree2);
     ASSERT_TRUE(areTreesEqual(empty_tree1, empty_merged_tree, 0));
 
-    // TODO: check copy constructor, why it doesnt copy properly
     AVLTree<int, int> merged_tree_1_empty = AVLTree<int, int>::merge(tree1, empty_tree2);
-
     ASSERT_TRUE(areTreesEqual(merged_tree_1_empty,tree1,3));
 
     return true;
@@ -304,5 +319,6 @@ int main() {
     RUN_TEST(testRemoveLL);
     RUN_TEST(testRemoveLR);
     RUN_TEST(testMerge);
+    RUN_TEST(testFind);
     return 0;
 }
