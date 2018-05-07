@@ -5,4 +5,4 @@ set(CMAKE_CXX_STANDARD 98)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wall -Werror -pedantic")
 
-add_executable(DataStructures_HW1 AVLTree.h exceptions.h testMacros.h AVLTree_test.cpp)
+add_executable(DataStructures_HW1 AVLTree.h exceptions.h testMacros.h AVLTree_test.cpp library1.h Oasis.cpp Oasis.h)
