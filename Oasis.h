@@ -66,6 +66,7 @@ class Oasis {
     public:
 
         int id;
+        //TODO: shouldn't best_player be only in Oasis??
         Player *best_player;
         int members_size;
         AVLTree<Player *, DoubleKey> members_coins;
@@ -112,6 +113,8 @@ public:
     void getScoreboard(int clanID, int **players, int *numOfPlayers);
 
     void uniteClans(int clanID1, int clanID2); // ILYA
+
+    void mergeClans(Clan *clan_s, Clan *clan_d);
 };
 
 #endif //DATASTRUCTURES_HW1_OASIS_H

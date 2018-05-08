@@ -449,12 +449,12 @@ public:
 
     AVLTree &operator=(const AVLTree &tree) = delete;
 
-    T find(Key key) {
+    T* find(Key key) {
         Node *node = binarySearch(key);
         if (key != *node->key) {
             throw AVLElementNotFound();
         }
-        return *(node->data);
+        return (node->data);
     }
 
     bool insert(const T &data, Key key) {
