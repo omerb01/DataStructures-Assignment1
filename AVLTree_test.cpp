@@ -270,13 +270,21 @@ bool testFind() {
     ASSERT_EXCEPTION(tree1.find(14), AVLElementNotFound);
     ASSERT_EXCEPTION(tree1.find(300), AVLElementNotFound);
     ASSERT_EXCEPTION(tree1.find(14), AVLElementNotFound);
-    ASSERT_TRUE(*tree1.find(10) == 10);
-    ASSERT_TRUE(*tree1.find(13) == 13);
-    ASSERT_TRUE(*tree1.find(1) == 1);
+    ASSERT_TRUE(tree1.find(10) == 10);
+    ASSERT_TRUE(tree1.find(13) == 13);
+    ASSERT_TRUE(tree1.find(1) == 1);
     return true;
 }
 
 bool testMerge() {
+    class Filter {
+
+    public:
+        bool operator()(int num) {
+            return false;
+        }
+    };
+
     AVLTree<int, int> tree1;
     tree1.insert(10, 10);
     tree1.insert(8, 8);
@@ -287,7 +295,7 @@ bool testMerge() {
     tree2.insert(9, 9);
     tree2.insert(11, 11);
 
-    AVLTree<int, int> merged_tree_1_2 = AVLTree<int, int>::merge(tree1, tree2);
+    AVLTree<int, int> merged_tree_1_2 = AVLTree<int, int>::merge(tree1, tree2, Filter());
 
     AVLTree<int, int> tree3;
     tree3.insert(11, 11);
@@ -300,10 +308,10 @@ bool testMerge() {
 
     AVLTree<int, int> empty_tree1;
     AVLTree<int, int> empty_tree2;
-    AVLTree<int, int> empty_merged_tree = AVLTree<int, int>::merge(empty_tree1, empty_tree2);
+    AVLTree<int, int> empty_merged_tree = AVLTree<int, int>::merge(empty_tree1, empty_tree2, Filter());
     ASSERT_TRUE(areTreesEqual(empty_tree1, empty_merged_tree, 0));
 
-    AVLTree<int, int> merged_tree_1_empty = AVLTree<int, int>::merge(tree1, empty_tree2);
+    AVLTree<int, int> merged_tree_1_empty = AVLTree<int, int>::merge(tree1, empty_tree2, Filter());
     ASSERT_TRUE(areTreesEqual(merged_tree_1_empty, tree1, 3));
 
     return true;

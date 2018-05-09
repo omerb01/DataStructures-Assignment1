@@ -240,18 +240,25 @@ class AVLTree {
 
     template <class Predicate>
     static Node** filterElements(Node** sorted_array, int* size, Predicate filterFunc) {
-        int temp = *size;
-        for (int i = 0; i < temp; i++) {
+        if(sorted_array == nullptr) return nullptr;
+
+        int temp_size = *size;
+        for (int i = 0; i < temp_size; i++) {
             if (filterFunc((*sorted_array)->data)) {
                 (*size)--;
             }
         }
 
+        if(*size == 0) return nullptr;
         Node** result = new Node*[*size];
-        for(int i =0; i < *size; i++) {
+        Node **temp = result;
+        Node **p = sorted_array;
+        while (p != sorted_array + temp_size) {
             if (!filterFunc((*sorted_array)->data)) {
-                result[i] = *sorted_array;
+                *temp = *p;
+                temp++;
             }
+            p++;
         }
 
         return result;
@@ -454,11 +461,6 @@ public:
         deleteTreeRecursive(root);
     }
 
-    AVLTree(const AVLTree &tree) {
-        Node *tree_copy = copyTreeRecursive(tree.root);
-        root = tree_copy;
-    }
-
     T& find(Key key) {
         Node *node = binarySearch(key);
         if (key != node->key) {
@@ -565,8 +567,8 @@ public:
     static AVLTree merge(const AVLTree &tree1, const AVLTree &tree2, Predicate filterFunc) {
         Node **temp;
 
-        if (tree1.root == nullptr) return AVLTree(tree2);
-        if (tree2.root == nullptr) return AVLTree(tree1);
+        if (tree1.root == nullptr) return AVLTree(copyTreeRecursive(tree2.root));
+        if (tree2.root == nullptr) return AVLTree(copyTreeRecursive(tree1.root));
 
         int size_a = getSize(tree1.root);
         Node **a = new Node *[size_a];
