@@ -53,3 +53,7 @@ StatusType getScoreboard(void *DS, int clanID, int **players, int *numOfPlayers)
 StatusType uniteClans(void *DS, int clanID1, int clanID2) {
     GENERIC_OUTPUT(((Oasis *) DS)->uniteClans(clanID1, clanID2));
 }
+
+void quit(void** DS) {
+    delete (Oasis *) DS;
+}
