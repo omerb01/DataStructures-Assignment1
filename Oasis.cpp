@@ -146,7 +146,7 @@ void Oasis::getScoreboard(int clanID, int **players, int *numOfPlayers) {
         throw OasisInvalidInput();
     else if (clanID > 0) {
         try {
-            Clan& clan = clans.find(clanID);
+            Clan &clan = clans.find(clanID);
             Player **members_coins = clan.members_coins.inOrderToArray();
             if (members_coins == nullptr) {
                 *players = nullptr;
@@ -185,48 +185,57 @@ void Oasis::getScoreboard(int clanID, int **players, int *numOfPlayers) {
     }
 }
 
-static void mergeClans(Clan *clan_s, Clan *clan_d) {
-    clan_d->members_size += clan_s->members_size;
-    clan_s->best_player->challenges > clan_d->best_player->challenges
-    ? clan_d->best_player = clan_s->best_player : 0;
-    AVLTree<Player *, DoubleKey> new_members_coins = clan_d->members_coins.merge(
-            clan_s->members_coins, clan_d->members_coins);
-    clans.remove(clan_s->id);
-}
-
 void Oasis::uniteClans(int clanID1, int clanID2) {
     if (clanID1 <= 0 || clanID2 <= 0 || clanID2 == clanID1) {
         throw OasisInvalidInput();
     }
-    Clan& clan1 = clans.find(clanID1);
-    Clan& clan2 = clans.find(clanID2);
-    Player **clan1_p = clan1->members_coins.inOrderToArray();
-    Player **clan2_p = clan2->members_coins.inOrderToArray();
-    for (int i = 0; i < clan1->members_size; i++) {
-        if (clan1_p[i]->challenges == 0) {
-            clan1_p[i]->clan = -1;
-            DoubleKey key_c1(clan1_p[i]->id, clan1_p[i]->coins);
-            clan1->members_coins.remove(key_c1);
-            clan1->members_size--;
+    Clan &clan1 = clans.find(clanID1);
+    Clan &clan2 = clans.find(clanID2);
+
+    class FilterChallenges {
+        Clan* clan;
+
+    public:
+        explicit FilterChallenges(Clan* clan) {
+            this->clan = clan;
         }
-        if (clan2_p[i]->challenges == 0) {
-            clan2_p[i]->clan = -1;
-            DoubleKey key_c2(clan2_p[i]->id, clan2_p[i]->coins);
-            clan2->members_coins.remove(key_c2);
-            clan2->members_size--;
+
+        bool operator()(Player *player) {
+            if(player->challenges == 0) {
+                player->clan = nullptr;
+                return false;
+            }
+            player->clan = this->clan;
+            return true;
         }
-    }
-    if (clan1->members_size > clan2->members_size) {
-        mergeClans(clan2, clan1);
-    } else if (clan1->members_size < clan2->members_size) {
-        mergeClans(clan1, clan2);
-    } else {
-        if (clan1->id < clan2->id) {
-            mergeClans(clan2, clan1);
+    };
+
+    Clan* new_merged_clan = nullptr;
+    if (clan1.members_size > clan2.members_size) {
+        new_merged_clan = &clan1;
+    } else if (clan1.members_size == clan2.members_size) {
+        if (clan1.id > clan2.id) {
+            new_merged_clan = &clan2;
         } else {
-            mergeClans(clan1, clan2);
+            new_merged_clan = &clan1;
         }
+    } else {
+        new_merged_clan = &clan2;
     }
-    delete clan1_p;
-    delete clan2_p;
+
+    FilterChallenges filter(new_merged_clan);
+    AVLTree<Player*, DoubleKey> tree = clan1.members_coins.merge(clan1.members_coins,
+                                                                 clan2.members_coins, filter);
+
+    new_merged_clan->members_size = tree.getTreeSize();
+    if (clan1.best_player->challenges > clan2.best_player->challenges) {
+        new_merged_clan->best_player = clan1.best_player;
+    } else {
+        new_merged_clan->best_player = clan2.best_player;
+    }
+    new_merged_clan->members_coins = tree;
+
+    clans.remove(clan1.id);
+    clans.remove(clan2.id);
+    clans.insert(*new_merged_clan, new_merged_clan->id);
 }

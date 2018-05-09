@@ -238,6 +238,25 @@ class AVLTree {
         return result;
     }
 
+    template <class Predicate>
+    static Node** filterElements(Node** sorted_array, int* size, Predicate filterFunc) {
+        int temp = *size;
+        for (int i = 0; i < temp; i++) {
+            if (filterFunc((*sorted_array)->data)) {
+                (*size)--;
+            }
+        }
+
+        Node** result = new Node*[*size];
+        for(int i =0; i < *size; i++) {
+            if (!filterFunc((*sorted_array)->data)) {
+                result[i] = *sorted_array;
+            }
+        }
+
+        return result;
+    }
+
     static Node **clearSameElements(Node **sorted_array, int size, int *new_size) {
         *new_size = size;
         for (int i = 0; i < size - 1; i++) {
@@ -538,7 +557,12 @@ public:
         return true;
     }
 
-    static AVLTree merge(const AVLTree &tree1, const AVLTree &tree2) {
+    int getTreeSize() const {
+        return getSize(root);
+    }
+
+    template <class Predicate>
+    static AVLTree merge(const AVLTree &tree1, const AVLTree &tree2, Predicate filterFunc) {
         Node **temp;
 
         if (tree1.root == nullptr) return AVLTree(tree2);
@@ -556,12 +580,14 @@ public:
 
         int new_size = 0;
         Node **uncleared_c = mergeNodeArrays(a, size_a, b, size_b);
-        Node **c = clearSameElements(uncleared_c, size_a + size_b, &new_size);
+        Node **unfiltered_c = clearSameElements(uncleared_c, size_a + size_b, &new_size);
+        Node **c = filterElements(unfiltered_c, &new_size, filterFunc);
 
         Node *new_root = buildIncompleteTree(c, new_size);
         delete[] a;
         delete[] b;
         delete[] uncleared_c;
+        delete[] unfiltered_c;
         delete[] c;
 
         return AVLTree(new_root);
