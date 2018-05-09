@@ -6,6 +6,7 @@
 #include "Oasis.h"
 
 #define GENERIC_OUTPUT($$command$$) \
+if(DS == nullptr) return INVALID_INPUT; \
 try { \
 $$command$$; \
 return SUCCESS; \
