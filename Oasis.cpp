@@ -192,6 +192,24 @@ void Oasis::uniteClans(int clanID1, int clanID2) {
     Clan &clan1 = clans.find(clanID1);
     Clan &clan2 = clans.find(clanID2);
 
+    Clan* new_merged_clan = nullptr;
+    Clan* clan_to_remove = nullptr;
+    if (clan1.members_size > clan2.members_size) {
+        new_merged_clan = &clan1;
+        clan_to_remove = &clan2;
+    } else if (clan1.members_size == clan2.members_size) {
+        if (clan1.id > clan2.id) {
+            new_merged_clan = &clan2;
+            clan_to_remove = &clan1;
+        } else {
+            new_merged_clan = &clan1;
+            clan_to_remove = &clan2;
+        }
+    } else {
+        new_merged_clan = &clan2;
+        clan_to_remove = &clan1;
+    }
+
     class FilterChallenges {
         Clan* clan;
 
@@ -209,20 +227,6 @@ void Oasis::uniteClans(int clanID1, int clanID2) {
             return true;
         }
     };
-
-    Clan* new_merged_clan = nullptr;
-    if (clan1.members_size > clan2.members_size) {
-        new_merged_clan = &clan1;
-    } else if (clan1.members_size == clan2.members_size) {
-        if (clan1.id > clan2.id) {
-            new_merged_clan = &clan2;
-        } else {
-            new_merged_clan = &clan1;
-        }
-    } else {
-        new_merged_clan = &clan2;
-    }
-
     FilterChallenges filter(new_merged_clan);
     AVLTree<Player*, DoubleKey> tree = clan1.members_coins.merge(clan1.members_coins,
                                                                  clan2.members_coins, filter);
@@ -235,7 +239,5 @@ void Oasis::uniteClans(int clanID1, int clanID2) {
     }
     new_merged_clan->members_coins = tree;
 
-    clans.remove(clan1.id);
-    clans.remove(clan2.id);
-    clans.insert(*new_merged_clan, new_merged_clan->id);
+    clans.remove(clan_to_remove->id);
 }
