@@ -58,8 +58,6 @@ class Oasis {
             this->coins = coins;
             challenges = 0;
         }
-
-        Player &operator=(const Player &player) = delete;
     };
 
     class Clan {
@@ -82,8 +80,6 @@ class Oasis {
             best_player = nullptr;
             members_size = 0;
         }
-
-        Clan &operator=(const Clan &player) = delete;
     };
 
     AVLTree<Player, int> players;

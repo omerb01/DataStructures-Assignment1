@@ -109,7 +109,7 @@ void Oasis::completeChallenge(int playerID, int coins) {
     Player *player;
     Clan *players_clan = nullptr;
     try {
-        Player *player = players.find(playerID);
+        player = players.find(playerID);
     } catch (AVLElementNotFound &e) {
         throw OasisFailure(); //player not found
     }
@@ -197,9 +197,6 @@ void Oasis::mergeClans(Clan *clan_s, Clan *clan_d) {
     ? clan_d->best_player = clan_s->best_player : 0;
     AVLTree<Player *, DoubleKey> new_members_coins = clan_d->members_coins.merge(
             clan_s->members_coins, clan_d->members_coins);
-    //TODO: destructor should do that?
-    delete clan_s->members_coins;
-    delete clan_d->members_coins;
     clans.remove(clan_s->id);
 }
 
