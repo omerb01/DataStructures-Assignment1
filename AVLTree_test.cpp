@@ -177,17 +177,17 @@ bool testRemoveRL() {
     //Roll RL
     tree1.remove(1);
 
-    tree2.insert(8,8);
-    tree2.insert(5,5);
-    tree2.insert(10,10);
-    tree2.insert(3,3);
-    tree2.insert(6,6);
-    tree2.insert(9,9);
-    tree2.insert(12,12);
-    tree2.insert(2,2);
-    tree2.insert(4,4);
-    tree2.insert(7,7);
-    tree2.insert(11,11);
+    tree2.insert(8, 8);
+    tree2.insert(5, 5);
+    tree2.insert(10, 10);
+    tree2.insert(3, 3);
+    tree2.insert(6, 6);
+    tree2.insert(9, 9);
+    tree2.insert(12, 12);
+    tree2.insert(2, 2);
+    tree2.insert(4, 4);
+    tree2.insert(7, 7);
+    tree2.insert(11, 11);
 
 
     ASSERT_TRUE(areTreesEqual(tree1, tree2, 11));
@@ -214,17 +214,17 @@ bool testRemoveLL() {
     // Roll LL:
     tree1.remove(4);
 
-    tree2.insert(8,8);
-    tree2.insert(5,5);
-    tree2.insert(11,11);
-    tree2.insert(2,2);
-    tree2.insert(7,7);
-    tree2.insert(10,10);
-    tree2.insert(12,12);
-    tree2.insert(1,1);
-    tree2.insert(3,3);
-    tree2.insert(6,6);
-    tree2.insert(9,9);
+    tree2.insert(8, 8);
+    tree2.insert(5, 5);
+    tree2.insert(11, 11);
+    tree2.insert(2, 2);
+    tree2.insert(7, 7);
+    tree2.insert(10, 10);
+    tree2.insert(12, 12);
+    tree2.insert(1, 1);
+    tree2.insert(3, 3);
+    tree2.insert(6, 6);
+    tree2.insert(9, 9);
 
     ASSERT_TRUE(areTreesEqual(tree1, tree2, 11));
     return true;
@@ -234,45 +234,45 @@ bool testRemoveLR() {
     AVLTree<int, int> tree1;
     AVLTree<int, int> tree2;
 
-    tree1.insert(10,10);
-    tree1.insert(1,1);
-    tree1.insert(12,12);
-    tree1.insert(0,0);
-    tree1.insert(2,2);
-    tree1.insert(13,13);
-    tree1.insert(5,5);
-    tree1.insert(4,4);
+    tree1.insert(10, 10);
+    tree1.insert(1, 1);
+    tree1.insert(12, 12);
+    tree1.insert(0, 0);
+    tree1.insert(2, 2);
+    tree1.insert(13, 13);
+    tree1.insert(5, 5);
+    tree1.insert(4, 4);
 
     //LR Roll:
     tree1.remove(13);
 
-    tree2.insert(4,4);
-    tree2.insert(1,1);
-    tree2.insert(10,10);
-    tree2.insert(0,0);
-    tree2.insert(2,2);
-    tree2.insert(5,5);
-    tree2.insert(12,12);
+    tree2.insert(4, 4);
+    tree2.insert(1, 1);
+    tree2.insert(10, 10);
+    tree2.insert(0, 0);
+    tree2.insert(2, 2);
+    tree2.insert(5, 5);
+    tree2.insert(12, 12);
     return true;
 }
 
 bool testFind() {
     AVLTree<int, int> tree1;
-    tree1.insert(10,10);
-    tree1.insert(1,1);
-    tree1.insert(12,12);
-    tree1.insert(0,0);
-    tree1.insert(2,2);
-    tree1.insert(13,13);
-    tree1.insert(5,5);
-    tree1.insert(4,4);
+    tree1.insert(10, 10);
+    tree1.insert(1, 1);
+    tree1.insert(12, 12);
+    tree1.insert(0, 0);
+    tree1.insert(2, 2);
+    tree1.insert(13, 13);
+    tree1.insert(5, 5);
+    tree1.insert(4, 4);
 
     ASSERT_EXCEPTION(tree1.find(14), AVLElementNotFound);
     ASSERT_EXCEPTION(tree1.find(300), AVLElementNotFound);
     ASSERT_EXCEPTION(tree1.find(14), AVLElementNotFound);
-    ASSERT_TRUE(tree1.find(10) == 10);
-    ASSERT_TRUE(tree1.find(13) == 13);
-    ASSERT_TRUE(tree1.find(1) == 1);
+    ASSERT_TRUE(*tree1.find(10) == 10);
+    ASSERT_TRUE(*tree1.find(13) == 13);
+    ASSERT_TRUE(*tree1.find(1) == 1);
     return true;
 }
 
@@ -304,7 +304,7 @@ bool testMerge() {
     ASSERT_TRUE(areTreesEqual(empty_tree1, empty_merged_tree, 0));
 
     AVLTree<int, int> merged_tree_1_empty = AVLTree<int, int>::merge(tree1, empty_tree2);
-    ASSERT_TRUE(areTreesEqual(merged_tree_1_empty,tree1,3));
+    ASSERT_TRUE(areTreesEqual(merged_tree_1_empty, tree1, 3));
 
     return true;
 }
