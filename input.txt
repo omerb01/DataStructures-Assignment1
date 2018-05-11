@@ -1,0 +1,14 @@
+init
+addPlayer 1 100
+addPlayer 2 200
+completeChallange 1 1
+completeChallange 2 1
+addPlayer 3 500
+addClan 1
+addClan 2
+joinClan 1 1
+joinClan 2 2
+joinClan 3 2
+completeChallange 2 1000
+uniteClans 1 2
+getScoreboard 2

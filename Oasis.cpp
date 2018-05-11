@@ -43,6 +43,10 @@ void Oasis::addPlayer(int playerID, int initialCoins) {
     }
     Player &p = players.find(playerID);
     players_coins.insert(&p, new_key);
+    if(best_player== nullptr){
+        best_player=&p;
+    }
+    //TODO: best_player should be null or contains at least zero challenges?
 }
 
 void Oasis::addClan(int clanID) {
@@ -59,7 +63,7 @@ void Oasis::joinClan(int playerID, int clanID) {
         Player &player = players.find(playerID);
         Clan &players_clan = clans.find(clanID);
 
-        if (player.clan == nullptr) {
+        if (player.clan > 0) {
             throw OasisFailure(); //player is already in a different clan
         }
 
@@ -67,7 +71,11 @@ void Oasis::joinClan(int playerID, int clanID) {
         players_clan.members_coins.insert(&player, player_key);
         players_clan.members_size++;
 
-        if (player.challenges > players_clan.best_player->challenges) {
+        //TODO: we have to initialze the first player to be the best player.
+        if(players_clan.best_player == nullptr){
+            players_clan.best_player=&player;
+        }
+        else if (player.challenges > players_clan.best_player->challenges) {
             players_clan.best_player = &player;
         }
 
@@ -159,7 +167,7 @@ void Oasis::getScoreboard(int clanID, int **players, int *numOfPlayers) {
             *players = (int *) malloc(sizeof(int) * size);
             if (*players == nullptr) throw std::bad_alloc();
             for (int i = 0; i < size; i++) {
-                (*players)[i] = members_coins[i]->id;
+                (*players)[i] = members_coins[size-i-1]->id;
             }
             delete members_coins;
         }
@@ -179,7 +187,7 @@ void Oasis::getScoreboard(int clanID, int **players, int *numOfPlayers) {
         *players = (int *) malloc(sizeof(int) * size);
         if (*players == nullptr) throw std::bad_alloc();
         for (int i = 0; i < size; i++) {
-            (*players)[i] = players_coins[i]->id;
+            (*players)[i] = players_coins[size-i-1]->id;
         }
         delete players_coins;
     }
@@ -189,55 +197,63 @@ void Oasis::uniteClans(int clanID1, int clanID2) {
     if (clanID1 <= 0 || clanID2 <= 0 || clanID2 == clanID1) {
         throw OasisInvalidInput();
     }
-    Clan &clan1 = clans.find(clanID1);
-    Clan &clan2 = clans.find(clanID2);
-
-    Clan* new_merged_clan = nullptr;
-    Clan* clan_to_remove = nullptr;
-    if (clan1.members_size > clan2.members_size) {
-        new_merged_clan = &clan1;
-        clan_to_remove = &clan2;
-    } else if (clan1.members_size == clan2.members_size) {
-        if (clan1.id > clan2.id) {
-            new_merged_clan = &clan2;
-            clan_to_remove = &clan1;
-        } else {
+    try{
+        Clan &clan1 = clans.find(clanID1);
+        Clan &clan2 = clans.find(clanID2);
+        Clan* new_merged_clan = nullptr;
+        Clan* clan_to_remove = nullptr;
+        if (clan1.members_size > clan2.members_size) {
             new_merged_clan = &clan1;
             clan_to_remove = &clan2;
-        }
-    } else {
-        new_merged_clan = &clan2;
-        clan_to_remove = &clan1;
-    }
-
-    class FilterChallenges {
-        Clan* clan;
-
-    public:
-        explicit FilterChallenges(Clan* clan) {
-            this->clan = clan;
-        }
-
-        bool operator()(Player *player) {
-            if(player->challenges == 0) {
-                player->clan = nullptr;
-                return false;
+        } else if (clan1.members_size == clan2.members_size) {
+            if (clan1.id > clan2.id) {
+                new_merged_clan = &clan2;
+                clan_to_remove = &clan1;
+            } else {
+                new_merged_clan = &clan1;
+                clan_to_remove = &clan2;
             }
-            player->clan = this->clan;
-            return true;
+        } else {
+            new_merged_clan = &clan2;
+            clan_to_remove = &clan1;
         }
-    };
-    FilterChallenges filter(new_merged_clan);
-    AVLTree<Player*, DoubleKey> tree = clan1.members_coins.merge(clan1.members_coins,
-                                                                 clan2.members_coins, filter);
+        if(clan_to_remove->members_size==0){
+            clans.remove(clan_to_remove->id);
+            return;
+        }
+        class FilterChallenges {
+            Clan* clan;
 
-    new_merged_clan->members_size = tree.getTreeSize();
-    if (clan1.best_player->challenges > clan2.best_player->challenges) {
-        new_merged_clan->best_player = clan1.best_player;
-    } else {
-        new_merged_clan->best_player = clan2.best_player;
+        public:
+            explicit FilterChallenges(Clan* clan) {
+                this->clan = clan;
+            }
+
+            bool operator()(Player *player) {
+                if(player->challenges == 0) {
+                    player->clan = nullptr;
+                    return false;
+                }
+                player->clan = this->clan;
+                return true;
+            }
+        };
+        FilterChallenges filter(new_merged_clan);
+        AVLTree<Player*, DoubleKey> tree = clan1.members_coins.merge(clan1.members_coins,
+                                                                     clan2.members_coins, filter);
+
+        new_merged_clan->members_size = tree.getTreeSize();
+        if (clan1.best_player->challenges > clan2.best_player->challenges) {
+            new_merged_clan->best_player = clan1.best_player;
+        } else {
+            new_merged_clan->best_player = clan2.best_player;
+        }
+        new_merged_clan->members_coins = tree;
+
+        clans.remove(clan_to_remove->id);
+    }catch (AVLTreeException &e){
+        throw OasisFailure();
     }
-    new_merged_clan->members_coins = tree;
 
-    clans.remove(clan_to_remove->id);
+
 }

@@ -209,7 +209,7 @@ class AVLTree {
     }
 
     static Node **mergeNodeArrays(Node **a, int size_a, Node **b, int size_b) {
-        Node **result = new Node *[size_a + size_b];
+        Node **result = new Node *[(size_a + size_b)];
         Node **temp = result;
         Node **p1 = a;
         Node **p2 = b;
@@ -243,8 +243,9 @@ class AVLTree {
         if(sorted_array == nullptr) return nullptr;
 
         int temp_size = *size;
+
         for (int i = 0; i < temp_size; i++) {
-            if (filterFunc((*sorted_array)->data)) {
+            if (!filterFunc((sorted_array[i])->data)) {
                 (*size)--;
             }
         }
@@ -254,7 +255,8 @@ class AVLTree {
         Node **temp = result;
         Node **p = sorted_array;
         while (p != sorted_array + temp_size) {
-            if (!filterFunc((*sorted_array)->data)) {
+
+            if (filterFunc((*p)->data)) {
                 *temp = *p;
                 temp++;
             }
@@ -463,7 +465,8 @@ public:
 
     T& find(Key key) {
         Node *node = binarySearch(key);
-        if (key != node->key) {
+        //Todo:uniteClans with two non-existent clans has an error
+        if (node == nullptr || key != node->key) {
             throw AVLElementNotFound();
         }
         return node->data;
@@ -584,7 +587,7 @@ public:
         Node **uncleared_c = mergeNodeArrays(a, size_a, b, size_b);
         Node **unfiltered_c = clearSameElements(uncleared_c, size_a + size_b, &new_size);
         Node **c = filterElements(unfiltered_c, &new_size, filterFunc);
-
+        //TODO: here we need to create a new tree with 1 and 2 (ID's). ID=3 was filtered.
         Node *new_root = buildIncompleteTree(c, new_size);
         delete[] a;
         delete[] b;

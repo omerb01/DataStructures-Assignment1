@@ -89,9 +89,10 @@ static bool isInit = false;
 
 int main(int argc, const char**argv) {
 	char buffer[MAX_STRING_INPUT_SIZE];
-
+	FILE* fp;
+	fp = fopen("C:\\Users\\Ilya\\Desktop\\MATAM\\ASSIGN4\\DataStructures-Assignment1\\cmake-build-debug\\input.txt", "r");
 	// Reading commands
-	while (fgets(buffer, MAX_STRING_INPUT_SIZE, stdin) != NULL) {
+	while (fgets(buffer, MAX_STRING_INPUT_SIZE, fp) != NULL) {
 		fflush(stdout);
 		if (parser(buffer) == error)
 			break;
