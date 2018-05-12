@@ -342,6 +342,7 @@ class AVLTree {
     }
 
     static Node *buildIncompleteTree(Node **sorted_array, int size) {
+        //TODO: complete_height doesn't work
         int complete_height = (int) (ceil(log2(size)));
         Node *root = buildEmptyCompleteTree(complete_height);
         int leaves_to_remove = (int) (pow(2, complete_height) - size - 1);
@@ -418,9 +419,13 @@ class AVLTree {
     }
 
     static void deleteTreeRecursive(Node *root) {
-        if (root == nullptr) return;
-        deleteTreeRecursive(root->left);
+        if (root == nullptr){
+            return;
+        }
         deleteTreeRecursive(root->right);
+        deleteTreeRecursive(root->left);
+
+
         delete root;
     }
 
