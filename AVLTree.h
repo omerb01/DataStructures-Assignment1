@@ -31,7 +31,7 @@ class AVLTree {
             h_left = -1;
         }
 
-        Node(const T& data, const Key& key) {
+        Node(const T &data, const Key &key) {
             this->data = data;
             this->key = key;
             parent = nullptr;
@@ -238,9 +238,10 @@ class AVLTree {
         return result;
     }
 
-    template <class Predicate>
-    static Node** filterElements(Node** sorted_array, int* size, Predicate filterFunc) {
-        if(sorted_array == nullptr) return nullptr;
+    template<class Predicate>
+    static Node **
+    filterElements(Node **sorted_array, int *size, Predicate filterFunc) {
+        if (sorted_array == nullptr) return nullptr;
 
         int temp_size = *size;
 
@@ -250,8 +251,8 @@ class AVLTree {
             }
         }
 
-        if(*size == 0) return nullptr;
-        Node** result = new Node*[*size];
+        if (*size == 0) return nullptr;
+        Node **result = new Node *[*size];
         Node **temp = result;
         Node **p = sorted_array;
         while (p != sorted_array + temp_size) {
@@ -266,7 +267,8 @@ class AVLTree {
         return result;
     }
 
-    static Node **clearSameElements(Node **sorted_array, int size, int *new_size) {
+    static Node **
+    clearSameElements(Node **sorted_array, int size, int *new_size) {
         *new_size = size;
         for (int i = 0; i < size - 1; i++) {
             if (sorted_array[i]->key == sorted_array[i + 1]->key) {
@@ -310,12 +312,14 @@ class AVLTree {
         return root;
     }
 
-    static void removeVerticesFromCompleteTree(Node *root, int *leaves_to_remove) {
+    static void
+    removeVerticesFromCompleteTree(Node *root, int *leaves_to_remove) {
         if (root == nullptr) return;
 
         removeVerticesFromCompleteTree(root->right, leaves_to_remove);
         Node *left_son = root->left;
-        if (root->left == nullptr && root->right == nullptr && *leaves_to_remove > 0) {
+        if (root->left == nullptr && root->right == nullptr &&
+            *leaves_to_remove > 0) {
             Node *parent = root->parent;
             if (parent->left == root) {
                 parent->left = nullptr;
@@ -330,7 +334,8 @@ class AVLTree {
         removeVerticesFromCompleteTree(left_son, leaves_to_remove);
     }
 
-    static void putValuesInEmptyIncompleteTree(Node *root, Node ***sorted_array) {
+    static void
+    putValuesInEmptyIncompleteTree(Node *root, Node ***sorted_array) {
         if (root == nullptr) return;
 
         putValuesInEmptyIncompleteTree(root->left, sorted_array);
@@ -341,11 +346,11 @@ class AVLTree {
         putValuesInEmptyIncompleteTree(root->right, sorted_array);
     }
 
-    static Node *buildIncompleteTree(Node **sorted_array, int size){
-        if(sorted_array == nullptr) return nullptr;
-        int complete_height = (int) (ceil(log2(size)));
-        Node *root = buildEmptyCompleteTree(complete_height);
-        int leaves_to_remove = (int) (pow(2, complete_height+1) - size - 1);
+    static Node *buildIncompleteTree(Node **sorted_array, int size) {
+        if (sorted_array == nullptr) return nullptr;
+        int complete_height = (int) (ceil(log2(size+1)));
+        Node *root = buildEmptyCompleteTree(complete_height-1);
+        int leaves_to_remove = (int) (pow(2, complete_height) - size - 1);
         removeVerticesFromCompleteTree(root, &leaves_to_remove);
         putValuesInEmptyIncompleteTree(root, &sorted_array);
         return root;
@@ -366,10 +371,14 @@ class AVLTree {
         Node *parent = node->parent;
         if (parent == nullptr) {
             root = nullptr;
+        } else if (parent->left == node) {
+            parent->left= nullptr;
         } else if (parent->right == node) {
             parent->right = nullptr;
-        } else {
-            parent->left = nullptr;
+        } else if (parent->left->right == node) {
+            parent->left->right = nullptr;
+        } else if (parent->left->left == node) {
+            parent->left->left = nullptr;
         }
         delete node;
     }
@@ -419,7 +428,7 @@ class AVLTree {
     }
 
     static void deleteTreeRecursive(Node *root) {
-        if (root == nullptr){
+        if (root == nullptr) {
             return;
         }
         deleteTreeRecursive(root->right);
@@ -464,7 +473,7 @@ public:
         root = nullptr;
     }
 
-    AVLTree(const AVLTree& tree) {
+    AVLTree(const AVLTree &tree) {
         root = copyTreeRecursive(tree.root);
     }
 
@@ -472,13 +481,13 @@ public:
         deleteTreeRecursive(root);
     }
 
-    AVLTree& operator=(const AVLTree& tree) {
+    AVLTree &operator=(const AVLTree &tree) {
         deleteTreeRecursive(root);
         root = copyTreeRecursive(tree.root);
         return *this;
     }
 
-    T& find(Key key) {
+    T &find(Key key) {
         Node *node = binarySearch(key);
         //Todo:uniteClans with two non-existent clans has an error
         if (node == nullptr || key != node->key) {
@@ -581,12 +590,15 @@ public:
         return getSize(root);
     }
 
-    template <class Predicate>
-    static AVLTree merge(const AVLTree &tree1, const AVLTree &tree2, Predicate filterFunc) {
+    template<class Predicate>
+    static AVLTree
+    merge(const AVLTree &tree1, const AVLTree &tree2, Predicate filterFunc) {
         Node **temp;
 
-        if (tree1.root == nullptr) return AVLTree(copyTreeRecursive(tree2.root));
-        if (tree2.root == nullptr) return AVLTree(copyTreeRecursive(tree1.root));
+        if (tree1.root == nullptr)
+            return AVLTree(copyTreeRecursive(tree2.root));
+        if (tree2.root == nullptr)
+            return AVLTree(copyTreeRecursive(tree1.root));
 
         int size_a = getSize(tree1.root);
         Node **a = new Node *[size_a];
@@ -600,7 +612,8 @@ public:
 
         int new_size = 0;
         Node **uncleared_c = mergeNodeArrays(a, size_a, b, size_b);
-        Node **unfiltered_c = clearSameElements(uncleared_c, size_a + size_b, &new_size);
+        Node **unfiltered_c = clearSameElements(uncleared_c, size_a + size_b,
+                                                &new_size);
         Node **c = filterElements(unfiltered_c, &new_size, filterFunc);
         Node *new_root = buildIncompleteTree(c, new_size);
         delete[] a;
