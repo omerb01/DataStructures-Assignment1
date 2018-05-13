@@ -63,7 +63,7 @@ void Oasis::joinClan(int playerID, int clanID) {
         Player &player = players.find(playerID);
         Clan &players_clan = clans.find(clanID);
 
-        if (player.clan > 0) {
+        if (player.clan != nullptr) {
             throw OasisFailure(); //player is already in a different clan
         }
 

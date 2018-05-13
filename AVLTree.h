@@ -290,7 +290,7 @@ class AVLTree {
     }
 
     static Node *buildEmptyCompleteTree(int height) {
-        if (height == 0) return nullptr;
+        if (height == -1) return nullptr;
 
         Node *left = buildEmptyCompleteTree(height - 1);
         Node *right = buildEmptyCompleteTree(height - 1);
@@ -345,7 +345,7 @@ class AVLTree {
         //TODO: complete_height doesn't work
         int complete_height = (int) (ceil(log2(size)));
         Node *root = buildEmptyCompleteTree(complete_height);
-        int leaves_to_remove = (int) (pow(2, complete_height) - size - 1);
+        int leaves_to_remove = (int) (pow(2, complete_height+1) - size - 1);
         removeVerticesFromCompleteTree(root, &leaves_to_remove);
         putValuesInEmptyIncompleteTree(root, &sorted_array);
         return root;
