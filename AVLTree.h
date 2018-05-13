@@ -341,14 +341,23 @@ class AVLTree {
         putValuesInEmptyIncompleteTree(root->right, sorted_array);
     }
 
-    static Node *buildIncompleteTree(Node **sorted_array, int size) {
-        //TODO: complete_height doesn't work
-        int complete_height = (int) (ceil(log2(size)));
+    static Node *buildIncompleteTree(Node **sorted_array, int size){
+        int complete_height=0;
+        int leaves_to_remove=0;
+        if(size != 0){
+            complete_height = (int) (ceil(log2(size)));
+            leaves_to_remove = (int) (pow(2, complete_height+1) - size - 1);
+        }
         Node *root = buildEmptyCompleteTree(complete_height);
-        int leaves_to_remove = (int) (pow(2, complete_height+1) - size - 1);
-        removeVerticesFromCompleteTree(root, &leaves_to_remove);
-        putValuesInEmptyIncompleteTree(root, &sorted_array);
-        return root;
+        if(sorted_array != nullptr) {
+            removeVerticesFromCompleteTree(root, &leaves_to_remove);
+            putValuesInEmptyIncompleteTree(root, &sorted_array);
+            return root;
+        }else{
+            delete root;
+            return nullptr;
+        }
+
     }
 
     void swapNodesData(Node *v1, Node *v2) {
@@ -592,7 +601,6 @@ public:
         Node **uncleared_c = mergeNodeArrays(a, size_a, b, size_b);
         Node **unfiltered_c = clearSameElements(uncleared_c, size_a + size_b, &new_size);
         Node **c = filterElements(unfiltered_c, &new_size, filterFunc);
-        //TODO: here we need to create a new tree with 1 and 2 (ID's). ID=3 was filtered.
         Node *new_root = buildIncompleteTree(c, new_size);
         delete[] a;
         delete[] b;

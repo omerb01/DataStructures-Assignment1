@@ -56,7 +56,7 @@ void Oasis::addClan(int clanID) {
 }
 
 void Oasis::joinClan(int playerID, int clanID) {
-    if (playerID <= 0 || clanID == 0) {
+    if (playerID <= 0 || clanID <= 0) {
         throw OasisInvalidInput();
     }
     try {
@@ -91,14 +91,24 @@ int Oasis::getBestPlayer(int clanID) {
     else if (clanID > 0) {
         try {
             Clan &clan = clans.find(clanID);
-            if (clan.best_player == nullptr) throw OasisFailure();
+            if(clan.members_size==0){
+                return -1;
+            }
+            else if (clan.best_player == nullptr) {
+                throw OasisFailure();
+            }
             return clan.best_player->id;
         }
         catch (AVLElementNotFound &e) {
             throw OasisFailure();
         }
     } else { // clanID < 0
-        if (best_player == nullptr) throw OasisFailure();
+        if(players.getTreeSize() == 0){
+            return -1;
+        }
+        else if (best_player == nullptr) {
+            throw OasisFailure();
+        }
         return best_player->id;
     }
 }

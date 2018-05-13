@@ -90,7 +90,7 @@ static bool isInit = false;
 int main(int argc, const char**argv) {
 	char buffer[MAX_STRING_INPUT_SIZE];
 	FILE* fp;
-	fp = fopen("D:\\workspace\\CLion\\Data Structures\\DataStructures-HW1\\input.txt", "r");
+	fp = fopen("C:\\Users\\Ilya\\Desktop\\MATAM\\ASSIGN4\\DataStructures-Assignment1\\input.txt", "r");
 	// Reading commands
 	while (fgets(buffer, MAX_STRING_INPUT_SIZE, fp) != NULL) {
 		fflush(stdout);
