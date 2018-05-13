@@ -56,5 +56,5 @@ StatusType uniteClans(void *DS, int clanID1, int clanID2) {
 }
 
 void quit(void** DS) {
-    delete (Oasis *) DS;
+    delete (Oasis*)(*DS);
 }
