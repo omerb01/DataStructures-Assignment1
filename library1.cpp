@@ -56,5 +56,7 @@ StatusType uniteClans(void *DS, int clanID1, int clanID2) {
 }
 
 void quit(void** DS) {
+    if(DS == nullptr) return;
+    if(*DS == nullptr) return;
     delete (Oasis*)(*DS);
 }

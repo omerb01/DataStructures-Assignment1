@@ -43,8 +43,10 @@ void Oasis::addPlayer(int playerID, int initialCoins) {
     }
     Player &p = players.find(playerID);
     players_coins.insert(&p, new_key);
-    if(best_player== nullptr){
-        best_player=&p;
+    if (best_player == nullptr) {
+        best_player = &p;
+    } else if (best_player->challenges == 0) {
+        if (best_player->id > p.id) best_player = &p;
     }
     //TODO: best_player should be null or contains at least zero challenges?
 }
@@ -72,11 +74,12 @@ void Oasis::joinClan(int playerID, int clanID) {
         players_clan.members_size++;
 
         //TODO: we have to initialze the first player to be the best player.
-        if(players_clan.best_player == nullptr){
-            players_clan.best_player=&player;
-        }
-        else if (player.challenges > players_clan.best_player->challenges) {
+        if (players_clan.best_player == nullptr) {
             players_clan.best_player = &player;
+        } else if (player.challenges > players_clan.best_player->challenges) {
+            players_clan.best_player = &player;
+        } else if (player.challenges == players_clan.best_player->challenges) {
+            if (player.id < players_clan.best_player->id) players_clan.best_player = &player;
         }
 
         player.clan = &players_clan;
@@ -91,10 +94,9 @@ int Oasis::getBestPlayer(int clanID) {
     else if (clanID > 0) {
         try {
             Clan &clan = clans.find(clanID);
-            if(clan.members_size==0){
+            if (clan.members_size == 0) {
                 return -1;
-            }
-            else if (clan.best_player == nullptr) {
+            } else if (clan.best_player == nullptr) {
                 throw OasisFailure();
             }
             return clan.best_player->id;
@@ -103,10 +105,9 @@ int Oasis::getBestPlayer(int clanID) {
             throw OasisFailure();
         }
     } else { // clanID < 0
-        if(players.getTreeSize() == 0){
+        if (players.getTreeSize() == 0) {
             return -1;
-        }
-        else if (best_player == nullptr) {
+        } else if (best_player == nullptr) {
             throw OasisFailure();
         }
         return best_player->id;
@@ -135,10 +136,16 @@ void Oasis::completeChallenge(int playerID, int coins) {
 
             if (player.challenges > players_clan.best_player->challenges) {
                 players_clan.best_player = &player;
+            } else if (player.challenges == players_clan.best_player->challenges) {
+                if (player.id < players_clan.best_player->id) players_clan.best_player = &player;
             }
+
             if (player.challenges > best_player->challenges) {
                 best_player = &player;
+            } else if (player.challenges == best_player->challenges) {
+                if (player.id < best_player->id) best_player = &player;
             }
+
         } else {
             DoubleKey old_key(player.coins, player.id);
             players_coins.remove(old_key);
@@ -151,6 +158,9 @@ void Oasis::completeChallenge(int playerID, int coins) {
 
             if (player.challenges > best_player->challenges) {
                 best_player = &player;
+            }
+            else if(player.challenges == best_player->challenges) {
+                if(player.id < best_player->id) best_player = &player;
             }
         }
     }
@@ -177,7 +187,7 @@ void Oasis::getScoreboard(int clanID, int **players, int *numOfPlayers) {
             *players = (int *) malloc(sizeof(int) * size);
             if (*players == nullptr) throw std::bad_alloc();
             for (int i = 0; i < size; i++) {
-                (*players)[i] = members_coins[size-i-1]->id;
+                (*players)[i] = members_coins[size - i - 1]->id;
             }
             delete members_coins;
         }
@@ -197,7 +207,7 @@ void Oasis::getScoreboard(int clanID, int **players, int *numOfPlayers) {
         *players = (int *) malloc(sizeof(int) * size);
         if (*players == nullptr) throw std::bad_alloc();
         for (int i = 0; i < size; i++) {
-            (*players)[i] = players_coins[size-i-1]->id;
+            (*players)[i] = players_coins[size - i - 1]->id;
         }
         delete players_coins;
     }
@@ -207,11 +217,11 @@ void Oasis::uniteClans(int clanID1, int clanID2) {
     if (clanID1 <= 0 || clanID2 <= 0 || clanID2 == clanID1) {
         throw OasisInvalidInput();
     }
-    try{
+    try {
         Clan &clan1 = clans.find(clanID1);
         Clan &clan2 = clans.find(clanID2);
-        Clan* new_merged_clan = nullptr;
-        Clan* clan_to_remove = nullptr;
+        Clan *new_merged_clan = nullptr;
+        Clan *clan_to_remove = nullptr;
         if (clan1.members_size > clan2.members_size) {
             new_merged_clan = &clan1;
             clan_to_remove = &clan2;
@@ -227,20 +237,20 @@ void Oasis::uniteClans(int clanID1, int clanID2) {
             new_merged_clan = &clan2;
             clan_to_remove = &clan1;
         }
-        if(clan_to_remove->members_size==0){
+        if (clan_to_remove->members_size == 0) {
             clans.remove(clan_to_remove->id);
             return;
         }
         class FilterChallenges {
-            Clan* clan;
+            Clan *clan;
 
         public:
-            explicit FilterChallenges(Clan* clan) {
+            explicit FilterChallenges(Clan *clan) {
                 this->clan = clan;
             }
 
             bool operator()(Player *player) {
-                if(player->challenges == 0) {
+                if (player->challenges == 0) {
                     player->clan = nullptr;
                     return false;
                 }
@@ -249,18 +259,16 @@ void Oasis::uniteClans(int clanID1, int clanID2) {
             }
         };
         FilterChallenges filter(new_merged_clan);
-        AVLTree<Player*, DoubleKey> tree = clan1.members_coins.merge(clan1.members_coins,
-                                                                     clan2.members_coins, filter);
+        AVLTree<Player *, DoubleKey> tree = clan1.members_coins.merge(clan1.members_coins,
+                                                                      clan2.members_coins, filter);
 
         new_merged_clan->members_size = tree.getTreeSize();
         if (clan1.best_player->challenges > clan2.best_player->challenges) {
             new_merged_clan->best_player = clan1.best_player;
-        }
-        else if (clan1.best_player->challenges == clan2.best_player->challenges) {
-            if(clan1.best_player->id > clan2.best_player->id) {
+        } else if (clan1.best_player->challenges == clan2.best_player->challenges) {
+            if (clan1.best_player->id > clan2.best_player->id) {
                 new_merged_clan->best_player = clan2.best_player;
-            }
-            else {
+            } else {
                 new_merged_clan->best_player = clan1.best_player;
             }
         } else {
@@ -269,7 +277,7 @@ void Oasis::uniteClans(int clanID1, int clanID2) {
         new_merged_clan->members_coins = tree;
 
         clans.remove(clan_to_remove->id);
-    }catch (AVLTreeException &e){
+    } catch (AVLTreeException &e) {
         throw OasisFailure();
     }
 
