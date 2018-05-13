@@ -255,6 +255,14 @@ void Oasis::uniteClans(int clanID1, int clanID2) {
         new_merged_clan->members_size = tree.getTreeSize();
         if (clan1.best_player->challenges > clan2.best_player->challenges) {
             new_merged_clan->best_player = clan1.best_player;
+        }
+        else if (clan1.best_player->challenges == clan2.best_player->challenges) {
+            if(clan1.best_player->id > clan2.best_player->id) {
+                new_merged_clan->best_player = clan2.best_player;
+            }
+            else {
+                new_merged_clan->best_player = clan1.best_player;
+            }
         } else {
             new_merged_clan->best_player = clan2.best_player;
         }

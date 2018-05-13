@@ -342,25 +342,16 @@ class AVLTree {
     }
 
     static Node *buildIncompleteTree(Node **sorted_array, int size){
-        int complete_height=0;
-        int leaves_to_remove=0;
-        if(size != 0){
-            complete_height = (int) (ceil(log2(size)));
-            leaves_to_remove = (int) (pow(2, complete_height+1) - size - 1);
-        }
+        if(sorted_array == nullptr) return nullptr;
+        int complete_height = (int) (ceil(log2(size)));
         Node *root = buildEmptyCompleteTree(complete_height);
-        if(sorted_array != nullptr) {
-            removeVerticesFromCompleteTree(root, &leaves_to_remove);
-            putValuesInEmptyIncompleteTree(root, &sorted_array);
-            return root;
-        }else{
-            delete root;
-            return nullptr;
-        }
-
+        int leaves_to_remove = (int) (pow(2, complete_height+1) - size - 1);
+        removeVerticesFromCompleteTree(root, &leaves_to_remove);
+        putValuesInEmptyIncompleteTree(root, &sorted_array);
+        return root;
     }
 
-    void swapNodesData(Node *v1, Node *v2) {
+    static void swapNodesData(Node *v1, Node *v2) {
         T temp_data = v1->data;
         Key temp_key = v1->key;
 
@@ -473,8 +464,18 @@ public:
         root = nullptr;
     }
 
+    AVLTree(const AVLTree& tree) {
+        root = copyTreeRecursive(tree.root);
+    }
+
     ~AVLTree() {
         deleteTreeRecursive(root);
+    }
+
+    AVLTree& operator=(const AVLTree& tree) {
+        deleteTreeRecursive(root);
+        root = copyTreeRecursive(tree.root);
+        return *this;
     }
 
     T& find(Key key) {
