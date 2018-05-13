@@ -120,6 +120,9 @@ class AVLTree {
         new_parent = unbalanced->right; // new parent - left node of the unbalanced node
         unbalanced->right = new_parent->left; // if new node has right children, move to to old parent
         unbalanced->h_right = new_parent->h_left;
+        if(new_parent->left != nullptr) {
+            new_parent->left->parent = unbalanced;
+        }
 
         if (unbalanced->parent == nullptr) {
             root = new_parent;
