@@ -189,7 +189,7 @@ void Oasis::getScoreboard(int clanID, int **players, int *numOfPlayers) {
             for (int i = 0; i < size; i++) {
                 (*players)[i] = members_coins[size - i - 1]->id;
             }
-            delete members_coins;
+            delete[] members_coins;
         }
         catch (AVLElementNotFound &e) {
             throw OasisFailure();
@@ -209,9 +209,27 @@ void Oasis::getScoreboard(int clanID, int **players, int *numOfPlayers) {
         for (int i = 0; i < size; i++) {
             (*players)[i] = players_coins[size - i - 1]->id;
         }
-        delete players_coins;
+        delete[] players_coins;
     }
 }
+
+class FilterChallenges {
+    Clan *clan;
+
+public:
+    explicit FilterChallenges(Clan *clan) {
+        this->clan = clan;
+    }
+
+    bool operator()(Player *player) {
+        if (player->challenges == 0) {
+            player->clan = nullptr;
+            return false;
+        }
+        player->clan = this->clan;
+        return true;
+    }
+};
 
 void Oasis::uniteClans(int clanID1, int clanID2) {
     if (clanID1 <= 0 || clanID2 <= 0 || clanID2 == clanID1) {
@@ -241,26 +259,10 @@ void Oasis::uniteClans(int clanID1, int clanID2) {
             clans.remove(clan_to_remove->id);
             return;
         }
-        class FilterChallenges {
-            Clan *clan;
 
-        public:
-            explicit FilterChallenges(Clan *clan) {
-                this->clan = clan;
-            }
-
-            bool operator()(Player *player) {
-                if (player->challenges == 0) {
-                    player->clan = nullptr;
-                    return false;
-                }
-                player->clan = this->clan;
-                return true;
-            }
-        };
-        FilterChallenges filter(new_merged_clan);
         AVLTree<Player *, DoubleKey> tree = clan1.members_coins.merge(clan1.members_coins,
-                                                                      clan2.members_coins, filter);
+                                                                      clan2.members_coins,
+                                                                      FilterChallenges(new_merged_clan));
 
         new_merged_clan->members_size = tree.getTreeSize();
         if (clan1.best_player->challenges > clan2.best_player->challenges) {

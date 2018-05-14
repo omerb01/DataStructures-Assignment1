@@ -2,10 +2,10 @@
 // Created by Omer on 06/05/2018.
 //
 
-#include "testMacros.h"
+#include "../testMacros.h"
 #include <iostream>
-#include "AVLTree.h"
-#include "exceptions.h"
+#include "../AVLTree.h"
+#include "../exceptions.h"
 
 template<typename T>
 bool areArraysEqual(T *a, T *b, int n) {
@@ -276,15 +276,15 @@ bool testFind() {
     return true;
 }
 
+class Filter {
+
+public:
+    bool operator()(int num) {
+        return true;
+    }
+};
+
 bool testMerge() {
-    class Filter {
-
-    public:
-        bool operator()(int num) {
-            return false;
-        }
-    };
-
     AVLTree<int, int> tree1;
     tree1.insert(10, 10);
     tree1.insert(8, 8);

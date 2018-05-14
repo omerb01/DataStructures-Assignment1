@@ -10,6 +10,8 @@
 #ifndef DATASTRUCTURES_HW1_AVLTREE_H
 #define DATASTRUCTURES_HW1_AVLTREE_H
 
+#define nullptr 0
+
 using std::string;
 
 template<typename T, class Key>
@@ -93,49 +95,52 @@ class AVLTree {
         return vertex->h_right + 1;
     }
 
-    void roll_LL(Node *unbalanced) {
-        Node *new_parent;
+    void roll_LL(Node *A) {
+        Node *B;
 
-        new_parent = unbalanced->left; // new parent - left node of the unbalanced node
-        unbalanced->left = new_parent->right; // if new node has right children, move to to old parent
-        unbalanced->h_left = new_parent->h_right;
-
-        if (unbalanced->parent == nullptr) {
-            root = new_parent;
-        } else if (unbalanced->parent->left == unbalanced) {
-            unbalanced->parent->left = new_parent;
-        } else {
-            unbalanced->parent->right = new_parent;
+        B = A->left; // new parent - left node of the unbalanced node
+        A->left = B->right; // if new node has right children, move to to old parent
+        A->h_left = B->h_right;
+        if (B->right != nullptr) {
+            B->right->parent = A;
         }
 
-        new_parent->right = unbalanced;
-        new_parent->h_right = getHeight(unbalanced);
-        new_parent->parent = unbalanced->parent;
-        unbalanced->parent = new_parent;
+        if (A->parent == nullptr) {
+            root = B;
+        } else if (A->parent->left == A) {
+            A->parent->left = B;
+        } else {
+            A->parent->right = B;
+        }
+
+        B->right = A;
+        B->h_right = getHeight(A);
+        B->parent = A->parent;
+        A->parent = B;
     }
 
-    void roll_RR(Node *unbalanced) {
-        Node *new_parent;
+    void roll_RR(Node *A) {
+        Node *B;
 
-        new_parent = unbalanced->right; // new parent - left node of the unbalanced node
-        unbalanced->right = new_parent->left; // if new node has right children, move to to old parent
-        unbalanced->h_right = new_parent->h_left;
-        if(new_parent->left != nullptr) {
-            new_parent->left->parent = unbalanced;
+        B = A->right; // new parent - left node of the unbalanced node
+        A->right = B->left; // if new node has right children, move to to old parent
+        A->h_right = B->h_left;
+        if (B->left != nullptr) {
+            B->left->parent = A;
         }
 
-        if (unbalanced->parent == nullptr) {
-            root = new_parent;
-        } else if (unbalanced->parent->left == unbalanced) {
-            unbalanced->parent->left = new_parent;
+        if (A->parent == nullptr) {
+            root = B;
+        } else if (A->parent->left == A) {
+            A->parent->left = B;
         } else {
-            unbalanced->parent->right = new_parent;
+            A->parent->right = B;
         }
 
-        new_parent->left = unbalanced;
-        new_parent->h_left = getHeight(unbalanced);
-        new_parent->parent = unbalanced->parent;
-        unbalanced->parent = new_parent;
+        B->left = A;
+        B->h_left = getHeight(A);
+        B->parent = A->parent;
+        A->parent = B;
     }
 
     void roll_RL(Node *A) {
@@ -351,8 +356,8 @@ class AVLTree {
 
     static Node *buildIncompleteTree(Node **sorted_array, int size) {
         if (sorted_array == nullptr) return nullptr;
-        int complete_height = (int) (ceil(log2(size+1)));
-        Node *root = buildEmptyCompleteTree(complete_height-1);
+        int complete_height = (int) (ceil(log2(size + 1)));
+        Node *root = buildEmptyCompleteTree(complete_height - 1);
         int leaves_to_remove = (int) (pow(2, complete_height) - size - 1);
         removeVerticesFromCompleteTree(root, &leaves_to_remove);
         putValuesInEmptyIncompleteTree(root, &sorted_array);
@@ -375,13 +380,9 @@ class AVLTree {
         if (parent == nullptr) {
             root = nullptr;
         } else if (parent->left == node) {
-            parent->left= nullptr;
-        } else if (parent->right == node) {
+            parent->left = nullptr;
+        } else {
             parent->right = nullptr;
-        } else if (parent->left->right == node) {
-            parent->left->right = nullptr;
-        } else if (parent->left->left == node) {
-            parent->left->left = nullptr;
         }
         delete node;
     }

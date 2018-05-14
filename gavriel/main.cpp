@@ -1,5 +1,5 @@
 #include <iostream>
-#include "..\library1.h"
+#include "../library1.h"
 #include <cassert>
 #include <assert.h>
 #include <stdio.h>

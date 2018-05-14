@@ -6,8 +6,8 @@
 using std::cout;
 using std::endl;
 
-#include "..\testMacros.h"
-#include "..\library1.h"
+#include "../testMacros.h"
+#include "../library1.h"
 
 
 

@@ -59,4 +59,5 @@ void quit(void** DS) {
     if(DS == nullptr) return;
     if(*DS == nullptr) return;
     delete (Oasis*)(*DS);
+    *DS = nullptr;
 }

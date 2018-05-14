@@ -54,16 +54,16 @@ static const char *commandStr[] = {
 
 static const char* ReturnValToStr(int val) {
 	switch (val) {
-	case SUCCESS:
-		return "SUCCESS";
-	case ALLOCATION_ERROR:
-		return "ALLOCATION_ERROR";
-	case FAILURE:
-		return "FAILURE";
-	case INVALID_INPUT:
-		return "INVALID_INPUT";
-	default:
-		return "";
+		case SUCCESS:
+			return "SUCCESS";
+		case ALLOCATION_ERROR:
+			return "ALLOCATION_ERROR";
+		case FAILURE:
+			return "FAILURE";
+		case INVALID_INPUT:
+			return "INVALID_INPUT";
+		default:
+			return "";
 	}
 }
 
@@ -89,10 +89,9 @@ static bool isInit = false;
 
 int main(int argc, const char**argv) {
 	char buffer[MAX_STRING_INPUT_SIZE];
-	FILE* fp;
-	fp = fopen("C:\\Users\\Ilya\\Desktop\\MATAM\\ASSIGN4\\DataStructures-Assignment1\\input.txt", "r");
+
 	// Reading commands
-	while (fgets(buffer, MAX_STRING_INPUT_SIZE, fp) != NULL) {
+	while (fgets(buffer, MAX_STRING_INPUT_SIZE, stdin) != NULL) {
 		fflush(stdout);
 		if (parser(buffer) == error)
 			break;
@@ -105,7 +104,7 @@ int main(int argc, const char**argv) {
 /***************************************************************************/
 
 static commandType CheckCommand(const char* const command,
-		const char** const command_arg) {
+								const char** const command_arg) {
 	if (command == NULL || strlen(command) == 0 || StrCmp("\n", command))
 		return (NONE_CMD);
 	if (StrCmp("#", command)) {
@@ -149,43 +148,43 @@ static errorType parser(const char* const command) {
 
 	switch (command_val) {
 
-	case (INIT_CMD):
-		rtn_val = OnInit(&DS, command_args);
-		break;
-	case (ADDPLAYER_CMD):
-		rtn_val = OnAddPlayer(DS, command_args);
-		break;
-	case (ADDCLAN_CMD):
-		rtn_val = OnAddClan(DS, command_args);
-		break;
-	case (JOINCLAN_CMD):
-		rtn_val = OnJoinClan(DS, command_args);
-		break;
-	case (COMPLETECHALLANGE_CMD):
-		rtn_val = OnCompleteChallange(DS, command_args);
-		break;
-	case (UNITECLANS_CMD):
-		rtn_val = OnUniteClans(DS, command_args);
-		break;
-	case (GETBESTPLAYER_CMD):
-		rtn_val = OnGetBestPlayer(DS, command_args);
-		break;
-	case (GETSCOREBOARD_CMD):
-		rtn_val = OnGetScoreboard(DS, command_args);
-		break;
-	case (QUIT_CMD):
-		rtn_val = OnQuit(&DS, command_args);
-		break;
+		case (INIT_CMD):
+			rtn_val = OnInit(&DS, command_args);
+			break;
+		case (ADDPLAYER_CMD):
+			rtn_val = OnAddPlayer(DS, command_args);
+			break;
+		case (ADDCLAN_CMD):
+			rtn_val = OnAddClan(DS, command_args);
+			break;
+		case (JOINCLAN_CMD):
+			rtn_val = OnJoinClan(DS, command_args);
+			break;
+		case (COMPLETECHALLANGE_CMD):
+			rtn_val = OnCompleteChallange(DS, command_args);
+			break;
+		case (UNITECLANS_CMD):
+			rtn_val = OnUniteClans(DS, command_args);
+			break;
+		case (GETBESTPLAYER_CMD):
+			rtn_val = OnGetBestPlayer(DS, command_args);
+			break;
+		case (GETSCOREBOARD_CMD):
+			rtn_val = OnGetScoreboard(DS, command_args);
+			break;
+		case (QUIT_CMD):
+			rtn_val = OnQuit(&DS, command_args);
+			break;
 
-	case (COMMENT_CMD):
-		rtn_val = error_free;
-		break;
-	case (NONE_CMD):
-		rtn_val = error;
-		break;
-	default:
-		assert(false);
-		break;
+		case (COMMENT_CMD):
+			rtn_val = error_free;
+			break;
+		case (NONE_CMD):
+			rtn_val = error;
+			break;
+		default:
+			assert(false);
+			break;
 	};
 	return (rtn_val);
 }
@@ -256,7 +255,7 @@ static errorType OnAddClan(void* DS, const char* const command) {
 static errorType OnJoinClan(void* DS, const char* const command) {
 	int playerID, teamID;
 	ValidateRead(sscanf(command, "%d %d", &playerID, &teamID), 2,
-			"%s failed.\n", commandStr[JOINCLAN_CMD]);
+				 "%s failed.\n", commandStr[JOINCLAN_CMD]);
 	StatusType res = joinClan(DS, playerID, teamID);
 	if (res != SUCCESS) {
 		printf("%s: %s\n", commandStr[JOINCLAN_CMD], ReturnValToStr(res));
@@ -274,7 +273,7 @@ static errorType OnCompleteChallange(void* DS, const char* const command) {
 	int playerID;
 	int coins;
 	ValidateRead(sscanf(command, "%d %d", &playerID, &coins), 2,
-			"%s failed.\n", commandStr[COMPLETECHALLANGE_CMD]);
+				 "%s failed.\n", commandStr[COMPLETECHALLANGE_CMD]);
 	StatusType res = completeChallange(DS, playerID, coins);
 
 	if (res != SUCCESS) {
@@ -293,7 +292,7 @@ static errorType OnUniteClans(void* DS, const char* const command) {
 	int clan1;
 	int clan2;
 	ValidateRead(sscanf(command, "%d %d", &clan1, &clan2), 2,
-			"%s failed.\n", commandStr[UNITECLANS_CMD]);
+				 "%s failed.\n", commandStr[UNITECLANS_CMD]);
 	StatusType res = uniteClans(DS, clan1, clan2);
 
 	if (res != SUCCESS) {
@@ -344,7 +343,7 @@ void PrintAll(int *playerIDs, int numOfPlayers) {
 static errorType OnGetScoreboard(void* DS, const char* const command) {
 	int teamID;
 	ValidateRead(sscanf(command, "%d", &teamID), 1,
-			"%s failed.\n", commandStr[GETSCOREBOARD_CMD]);
+				 "%s failed.\n", commandStr[GETSCOREBOARD_CMD]);
 	int* playerIDs;
 	int numOfPlayers;
 	StatusType res = getScoreboard(DS, teamID, &playerIDs, &numOfPlayers);

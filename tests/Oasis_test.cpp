@@ -2,9 +2,9 @@
 // Created by Omer on 07/05/2018.
 //
 
-#include "Oasis.h"
-#include "testMacros.h"
-#include "exceptions.h"
+#include "../Oasis.h"
+#include "../testMacros.h"
+#include "../exceptions.h"
 
 bool addPlayer(){
     Oasis os();
