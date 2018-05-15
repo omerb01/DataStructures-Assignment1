@@ -247,9 +247,9 @@ class AVLTree {
         return result;
     }
 
-    template<class Predicate>
+    template<class Filter>
     static Node **
-    filterElements(Node **sorted_array, int *size, Predicate filterFunc) {
+    filterElements(Node **sorted_array, int *size, Filter filterFunc) {
         if (sorted_array == nullptr) return nullptr;
 
         int temp_size = *size;
@@ -278,7 +278,7 @@ class AVLTree {
 
     static Node **
     clearSameElements(Node **sorted_array, int size, int *new_size) {
-        if(size == 0) return nullptr;
+        if (size == 0) return nullptr;
 
         *new_size = size;
         for (int i = 0; i < size - 1; i++) {
@@ -297,7 +297,11 @@ class AVLTree {
             }
             p++;
         }
-        if ((*p)->key != (*(p - 1))->key) *temp = *p;
+        if (size != 1) {
+            if ((*p)->key != (*(p - 1))->key) *temp = *p;
+        } else {
+            *temp = *p;
+        }
 
         return result;
     }
@@ -412,7 +416,8 @@ class AVLTree {
 
     }
 
-    Node *deleteVertex(Node *node) {
+    template <class FixSwappedNodes>
+    Node *deleteVertex(Node *node, FixSwappedNodes func) {
         Node *parent = node->parent;
         if (node->left == nullptr && node->right == nullptr) {
             deleteVertexLeaf(node);
@@ -424,8 +429,9 @@ class AVLTree {
             Node *iterator = node->right;
             while (iterator->left != nullptr) iterator = iterator->left;
             swapNodesData(iterator, node);
+            func(node->data);
             parent = iterator->parent;
-            deleteVertex(iterator); // one son or a leaf
+            deleteVertex(iterator, func); // one son or a leaf
         }
         return parent;
     }
@@ -555,12 +561,13 @@ public:
         return true;
     }
 
-    bool remove(Key key) {
+    template<class FixSwappedNodes>
+    bool remove(Key key, FixSwappedNodes func) {
         Node *node = binarySearch(key);
         if (node == nullptr) return false;
         if (node->key != key) return false;
 
-        Node *v = deleteVertex(node);
+        Node *v = deleteVertex(node, func);
         Node *p = nullptr;
         while (v != nullptr) {
             p = v->parent;
@@ -597,9 +604,9 @@ public:
         return getSize(root);
     }
 
-    template<class Predicate>
+    template<class Filter>
     static AVLTree
-    merge(const AVLTree &tree1, const AVLTree &tree2, Predicate filterFunc) {
+    merge(const AVLTree &tree1, const AVLTree &tree2, Filter filterFunc) {
         Node **temp;
 
         int size_a = getSize(tree1.root);

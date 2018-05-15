@@ -5,6 +5,14 @@
 #include "Oasis.h"
 #include "exceptions.h"
 
+template<class T>
+class DoNothing {
+public:
+    void operator()(T &object) {
+
+    }
+};
+
 bool DoubleKey::operator==(const DoubleKey &key) {
     return key1 == key.key1 && key2 == key.key2;
 }
@@ -48,7 +56,6 @@ void Oasis::addPlayer(int playerID, int initialCoins) {
     } else if (best_player->challenges == 0) {
         if (best_player->id > p.id) best_player = &p;
     }
-    //TODO: best_player should be null or contains at least zero challenges?
 }
 
 void Oasis::addClan(int clanID) {
@@ -73,7 +80,6 @@ void Oasis::joinClan(int playerID, int clanID) {
         players_clan.members_coins.insert(&player, player_key);
         players_clan.members_size++;
 
-        //TODO: we have to initialze the first player to be the best player.
         if (players_clan.best_player == nullptr) {
             players_clan.best_player = &player;
         } else if (player.challenges > players_clan.best_player->challenges) {
@@ -124,8 +130,8 @@ void Oasis::completeChallenge(int playerID, int coins) {
         if (player.clan != nullptr) {
             Clan &players_clan = *player.clan;
             DoubleKey old_key(player.coins, player.id);
-            players_clan.members_coins.remove(old_key);
-            players_coins.remove(old_key);
+            players_clan.members_coins.remove(old_key, DoNothing<Player *>());
+            players_coins.remove(old_key, DoNothing<Player *>());
 
             player.coins += coins;
             player.challenges += 1;
@@ -133,6 +139,7 @@ void Oasis::completeChallenge(int playerID, int coins) {
             DoubleKey new_key(player.coins, player.id);
             players_clan.members_coins.insert(&player, new_key);
             players_coins.insert(&player, new_key);
+
 
             if (player.challenges > players_clan.best_player->challenges) {
                 players_clan.best_player = &player;
@@ -148,7 +155,7 @@ void Oasis::completeChallenge(int playerID, int coins) {
 
         } else {
             DoubleKey old_key(player.coins, player.id);
-            players_coins.remove(old_key);
+            players_coins.remove(old_key, DoNothing<Player*>());
 
             player.coins += coins;
             player.challenges += 1;
@@ -230,6 +237,17 @@ public:
     }
 };
 
+class FixSwappedNodesClan {
+public:
+    void operator()(Clan &clan) {
+        Player **members = clan.members_coins.inOrderToArray();
+
+        for (int i = 0; i < clan.members_size; i++) {
+            members[i]->clan = &clan;
+        }
+    }
+};
+
 void Oasis::uniteClans(int clanID1, int clanID2) {
     if (clanID1 <= 0 || clanID2 <= 0 || clanID2 == clanID1) {
         throw OasisInvalidInput();
@@ -282,11 +300,16 @@ void Oasis::uniteClans(int clanID1, int clanID2) {
             } else {
                 new_merged_clan->best_player = clan_to_remove->best_player;
             }
+        } else {
+            if (new_merged_clan->best_player != nullptr) {
+                if (new_merged_clan->best_player->challenges == 0)
+                    new_merged_clan->best_player = nullptr;
+            }
         }
 
         new_merged_clan->members_coins = tree;
 
-        clans.remove(clan_to_remove->id);
+        clans.remove(clan_to_remove->id, FixSwappedNodesClan());
     } catch (AVLTreeException &e) {
         throw OasisFailure();
     }
