@@ -158,9 +158,8 @@ void Oasis::completeChallenge(int playerID, int coins) {
 
             if (player.challenges > best_player->challenges) {
                 best_player = &player;
-            }
-            else if(player.challenges == best_player->challenges) {
-                if(player.id < best_player->id) best_player = &player;
+            } else if (player.challenges == best_player->challenges) {
+                if (player.id < best_player->id) best_player = &player;
             }
         }
     }
@@ -255,27 +254,36 @@ void Oasis::uniteClans(int clanID1, int clanID2) {
             new_merged_clan = &clan2;
             clan_to_remove = &clan1;
         }
-        if (clan_to_remove->members_size == 0) {
-            clans.remove(clan_to_remove->id);
-            return;
-        }
 
         AVLTree<Player *, DoubleKey> tree = clan1.members_coins.merge(clan1.members_coins,
                                                                       clan2.members_coins,
-                                                                      FilterChallenges(new_merged_clan));
+                                                                      FilterChallenges(
+                                                                              new_merged_clan));
 
         new_merged_clan->members_size = tree.getTreeSize();
-        if (clan1.best_player->challenges > clan2.best_player->challenges) {
-            new_merged_clan->best_player = clan1.best_player;
-        } else if (clan1.best_player->challenges == clan2.best_player->challenges) {
-            if (clan1.best_player->id > clan2.best_player->id) {
-                new_merged_clan->best_player = clan2.best_player;
+
+        if (clan_to_remove->best_player != nullptr) {
+            if (new_merged_clan->best_player != nullptr) {
+                if (clan1.best_player->challenges == 0 && clan2.best_player->challenges == 0) {
+                    new_merged_clan->best_player = nullptr;
+                } else {
+                    if (clan1.best_player->challenges > clan2.best_player->challenges) {
+                        new_merged_clan->best_player = clan1.best_player;
+                    } else if (clan1.best_player->challenges == clan2.best_player->challenges) {
+                        if (clan1.best_player->id > clan2.best_player->id) {
+                            new_merged_clan->best_player = clan2.best_player;
+                        } else {
+                            new_merged_clan->best_player = clan1.best_player;
+                        }
+                    } else {
+                        new_merged_clan->best_player = clan2.best_player;
+                    }
+                }
             } else {
-                new_merged_clan->best_player = clan1.best_player;
+                new_merged_clan->best_player = clan_to_remove->best_player;
             }
-        } else {
-            new_merged_clan->best_player = clan2.best_player;
         }
+
         new_merged_clan->members_coins = tree;
 
         clans.remove(clan_to_remove->id);

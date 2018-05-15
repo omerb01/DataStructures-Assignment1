@@ -217,6 +217,7 @@ class AVLTree {
     }
 
     static Node **mergeNodeArrays(Node **a, int size_a, Node **b, int size_b) {
+        if (size_a + size_b == 0) return nullptr;
         Node **result = new Node *[(size_a + size_b)];
         Node **temp = result;
         Node **p1 = a;
@@ -277,6 +278,8 @@ class AVLTree {
 
     static Node **
     clearSameElements(Node **sorted_array, int size, int *new_size) {
+        if(size == 0) return nullptr;
+
         *new_size = size;
         for (int i = 0; i < size - 1; i++) {
             if (sorted_array[i]->key == sorted_array[i + 1]->key) {
@@ -599,20 +602,21 @@ public:
     merge(const AVLTree &tree1, const AVLTree &tree2, Predicate filterFunc) {
         Node **temp;
 
-        if (tree1.root == nullptr)
-            return AVLTree(copyTreeRecursive(tree2.root));
-        if (tree2.root == nullptr)
-            return AVLTree(copyTreeRecursive(tree1.root));
-
         int size_a = getSize(tree1.root);
-        Node **a = new Node *[size_a];
-        temp = a;
-        sortToArray(tree1.root, &temp);
+        Node **a = nullptr;
+        if (size_a != 0) {
+            a = new Node *[size_a];
+            temp = a;
+            sortToArray(tree1.root, &temp);
+        }
 
         int size_b = getSize(tree2.root);
-        Node **b = new Node *[size_b];
-        temp = b;
-        sortToArray(tree2.root, &temp);
+        Node **b = nullptr;
+        if (size_b != 0) {
+            b = new Node *[size_b];
+            temp = b;
+            sortToArray(tree2.root, &temp);
+        }
 
         int new_size = 0;
         Node **uncleared_c = mergeNodeArrays(a, size_a, b, size_b);
