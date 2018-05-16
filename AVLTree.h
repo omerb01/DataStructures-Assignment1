@@ -17,7 +17,7 @@ using std::string;
 template<typename T, class Key>
 class AVLTree {
     struct Node {
-        T data;
+        T* data;
         Key key;
         Node *parent;
         Node *left;
@@ -26,6 +26,7 @@ class AVLTree {
         int h_right;
 
         Node() {
+            data = nullptr;
             parent = nullptr;
             left = nullptr;
             right = nullptr;
@@ -34,7 +35,7 @@ class AVLTree {
         }
 
         Node(const T &data, const Key &key) {
-            this->data = data;
+            this->data = new T(data);
             this->key = key;
             parent = nullptr;
             left = nullptr;
@@ -44,7 +45,7 @@ class AVLTree {
         }
 
         Node(const Node &node) {
-            data = node.data;
+            data = new T(*node.data);
             key = node.key;
             h_left = node.h_left;
             h_right = node.h_right;
@@ -255,7 +256,7 @@ class AVLTree {
         int temp_size = *size;
 
         for (int i = 0; i < temp_size; i++) {
-            if (!filterFunc((sorted_array[i])->data)) {
+            if (!filterFunc(*(sorted_array[i])->data)) {
                 (*size)--;
             }
         }
@@ -266,7 +267,7 @@ class AVLTree {
         Node **p = sorted_array;
         while (p != sorted_array + temp_size) {
 
-            if (filterFunc((*p)->data)) {
+            if (filterFunc(*(*p)->data)) {
                 *temp = *p;
                 temp++;
             }
@@ -372,7 +373,7 @@ class AVLTree {
     }
 
     static void swapNodesData(Node *v1, Node *v2) {
-        T temp_data = v1->data;
+        T* temp_data = v1->data;
         Key temp_key = v1->key;
 
         v1->data = v2->data;
@@ -416,8 +417,7 @@ class AVLTree {
 
     }
 
-    template <class FixSwappedNodes>
-    Node *deleteVertex(Node *node, FixSwappedNodes func) {
+    Node *deleteVertex(Node *node) {
         Node *parent = node->parent;
         if (node->left == nullptr && node->right == nullptr) {
             deleteVertexLeaf(node);
@@ -429,9 +429,8 @@ class AVLTree {
             Node *iterator = node->right;
             while (iterator->left != nullptr) iterator = iterator->left;
             swapNodesData(iterator, node);
-            func(node->data);
             parent = iterator->parent;
-            deleteVertex(iterator, func); // one son or a leaf
+            deleteVertex(iterator); // one son or a leaf
         }
         return parent;
     }
@@ -468,14 +467,14 @@ class AVLTree {
     static void inOrderToArrayRecursive(Node *root, T **array) {
         if (root == nullptr) return;
         inOrderToArrayRecursive(root->left, array);
-        **array = root->data;
+        **array = *root->data;
         (*array)++;
         inOrderToArrayRecursive(root->right, array);
     }
 
     static void preOrderToArrayRecursive(Node *root, T **array) {
         if (root == nullptr) return;
-        **array = root->data;
+        **array = *root->data;
         (*array)++;
         preOrderToArrayRecursive(root->left, array);
         preOrderToArrayRecursive(root->right, array);
@@ -506,7 +505,7 @@ public:
         if (node == nullptr || key != node->key) {
             throw AVLElementNotFound();
         }
-        return node->data;
+        return *node->data;
     }
 
     bool insert(const T &data, Key key) {
@@ -561,13 +560,12 @@ public:
         return true;
     }
 
-    template<class FixSwappedNodes>
-    bool remove(Key key, FixSwappedNodes func) {
+    bool remove(Key key) {
         Node *node = binarySearch(key);
         if (node == nullptr) return false;
         if (node->key != key) return false;
 
-        Node *v = deleteVertex(node, func);
+        Node *v = deleteVertex(node);
         Node *p = nullptr;
         while (v != nullptr) {
             p = v->parent;

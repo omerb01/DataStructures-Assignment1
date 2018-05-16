@@ -5,14 +5,6 @@
 #include "Oasis.h"
 #include "exceptions.h"
 
-template<class T>
-class DoNothing {
-public:
-    void operator()(T &object) {
-
-    }
-};
-
 bool DoubleKey::operator==(const DoubleKey &key) {
     return key1 == key.key1 && key2 == key.key2;
 }
@@ -130,8 +122,8 @@ void Oasis::completeChallenge(int playerID, int coins) {
         if (player.clan != nullptr) {
             Clan &players_clan = *player.clan;
             DoubleKey old_key(player.coins, player.id);
-            players_clan.members_coins.remove(old_key, DoNothing<Player *>());
-            players_coins.remove(old_key, DoNothing<Player *>());
+            players_clan.members_coins.remove(old_key);
+            players_coins.remove(old_key);
 
             player.coins += coins;
             player.challenges += 1;
@@ -155,7 +147,7 @@ void Oasis::completeChallenge(int playerID, int coins) {
 
         } else {
             DoubleKey old_key(player.coins, player.id);
-            players_coins.remove(old_key, DoNothing<Player*>());
+            players_coins.remove(old_key);
 
             player.coins += coins;
             player.challenges += 1;
@@ -237,17 +229,6 @@ public:
     }
 };
 
-class FixSwappedNodesClan {
-public:
-    void operator()(Clan &clan) {
-        Player **members = clan.members_coins.inOrderToArray();
-
-        for (int i = 0; i < clan.members_size; i++) {
-            members[i]->clan = &clan;
-        }
-    }
-};
-
 void Oasis::uniteClans(int clanID1, int clanID2) {
     if (clanID1 <= 0 || clanID2 <= 0 || clanID2 == clanID1) {
         throw OasisInvalidInput();
@@ -309,7 +290,7 @@ void Oasis::uniteClans(int clanID1, int clanID2) {
 
         new_merged_clan->members_coins = tree;
 
-        clans.remove(clan_to_remove->id, FixSwappedNodesClan());
+        clans.remove(clan_to_remove->id);
     } catch (AVLTreeException &e) {
         throw OasisFailure();
     }
